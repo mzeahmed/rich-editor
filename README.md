@@ -62,6 +62,7 @@ Passed as the second argument of `Editor.mount()` / `Editor.init()`.
 | `emoji` | `boolean` | `false` | Adds an inline emoji button that opens the built-in picker. |
 | `mention` | `boolean` | `false` | Enables `@mentions`. Requires `integrations.mentions`. |
 | `locale` | `'en' \| 'fr'` | `'en'` | Language of the interface and of the emojis. Page-wide setting. |
+| `mentionColors` | `MentionColors` | – | Colors of the mention bubble and of the mention link, for this editor. See [Mention colors](#mention-colors). |
 | `styles` | `{inject?: boolean; nonce?: string}` | `{inject: true}` | How styles reach the page. See [Styles and CSP](#styles-and-csp). Page-wide setting. |
 | `onChange` | `(change: EditorChange) => void` | – | Called on every change and once at mount. |
 
@@ -225,6 +226,88 @@ The markup produced by the editor contains **no `style="…"` attribute and no i
 handler**. It was verified in a browser under `default-src 'none'; script-src 'self';
 style-src 'self'` (no violation); with the default injection and no nonce, that policy blocks the
 styles. If your CSP restricts `img-src`, allow the origin of your users' avatars.
+
+## Mention colors
+
+### At mount (per editor)
+
+Pass the colors you want in the `mentionColors` option. Any CSS color works (`#0f9d7a`, `rgb(…)`,
+`hsl(…)`, a name, or `var(--brand)`); what you leave out keeps its default.
+
+```ts
+import Editor from '@mzeahmed/rich-editor';
+
+declare const textarea: HTMLTextAreaElement;
+declare const mentions: import('@mzeahmed/rich-editor').EditorMentionIntegration;
+
+Editor.mount(textarea, {
+  mention: true,
+  mentionColors: {
+    // Hovered or chosen user in the bubble
+    active: '#0f9d7a',
+    activeBackground: 'rgba(15, 157, 122, .08)',
+    activeBorder: 'rgba(15, 157, 122, .25)',
+    // Mention link inside the editor
+    link: '#0b7a5f',
+    linkBackground: 'rgba(15, 157, 122, .1)',
+    linkBorder: 'rgba(15, 157, 122, .3)',
+    linkHoverBackground: 'rgba(15, 157, 122, .18)',
+    linkHoverBorder: 'rgba(15, 157, 122, .4)',
+  },
+}, {mentions});
+```
+
+| Option | Used for |
+| --- | --- |
+| `active` | Name, avatar border and outline of the **hovered / chosen user** in the bubble |
+| `activeBackground` | Background of the hovered / chosen user |
+| `activeBorder` | Border of the hovered / chosen user, avatar border, keyboard focus ring |
+| `link` | Text color of the mention link in the editor |
+| `linkBackground` | Background of the mention link |
+| `linkBorder` | Border of the mention link |
+| `linkHoverBackground` | Background of the mention link on hover |
+| `linkHoverBorder` | Border of the mention link on hover |
+
+Each editor keeps its own colors: two editors on the same page can look different. The colors are
+applied through the CSSOM (`style.setProperty`), so they work under a strict CSP. Empty and
+non-string values are ignored.
+
+### With CSS (for the whole page)
+
+Behind the option, the colors are CSS custom properties. You can set them yourself in your
+stylesheet to style every editor of the page at once; an editor's `mentionColors` wins over them.
+Nothing is set by the package, so your values always win over the defaults, which are the blue below.
+
+| Variable | Used for | Default |
+| --- | --- | --- |
+| `--mzre-mention-active-color` | Name, avatar border and outline of the **hovered / chosen user** in the bubble | `#3b82f6` |
+| `--mzre-mention-active-bg` | Background of the hovered / chosen user | `rgba(59, 130, 246, .07)` |
+| `--mzre-mention-active-border` | Border of the hovered / chosen user, avatar border, keyboard focus ring | `rgba(59, 130, 246, .15)` |
+| `--mzre-mention-color` | Text color of the mention link in the editor | `#2563eb` |
+| `--mzre-mention-bg` | Background of the mention link | `rgba(59, 130, 246, .1)` |
+| `--mzre-mention-border` | Border of the mention link | `rgba(59, 130, 246, .2)` |
+| `--mzre-mention-hover-bg` | Background of the mention link on hover | `rgba(59, 130, 246, .16)` |
+| `--mzre-mention-hover-border` | Border of the mention link on hover | `rgba(59, 130, 246, .35)` |
+
+```css
+:root {
+  --mzre-mention-active-color: #0f9d7a;
+  --mzre-mention-active-bg: rgba(15, 157, 122, .08);
+  --mzre-mention-active-border: rgba(15, 157, 122, .25);
+  --mzre-mention-color: #0b7a5f;
+  --mzre-mention-bg: rgba(15, 157, 122, .1);
+  --mzre-mention-border: rgba(15, 157, 122, .25);
+}
+```
+
+The bubble is appended to `<body>`, outside of your editor's container: with CSS, set the
+`--mzre-mention-active-*` variables on `:root` or `body` (or on an ancestor of both), not on the
+editor's wrapper. The `--mzre-mention-*` variables of the link can also be set on any ancestor of the
+editor. (The `mentionColors` option has no such constraint: the package puts each value where it
+belongs.)
+
+They work under a strict CSP, and they can be changed at any time from JavaScript, for example for a
+dark theme: `document.documentElement.style.setProperty('--mzre-mention-color', '#7dd3fc')`.
 
 ## Security
 

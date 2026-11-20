@@ -11,6 +11,18 @@ Before a release, the pending entries below `[Unreleased]` are moved under a hea
 
 ## [Unreleased]
 
+### Added
+
+- The colors of the mention bubble and of the mention link are customizable, per editor, with the new
+  `mentionColors` option (`active`, `activeBackground`, `activeBorder` for the hovered or chosen user;
+  `link`, `linkBackground`, `linkBorder`, `linkHoverBackground`, `linkHoverBorder` for the link in the
+  editor) and the exported `MentionColors` type. The values are applied through the CSSOM, so they work
+  under a strict CSP.
+- The same colors are CSS custom properties (`--mzre-mention-active-color`, `--mzre-mention-active-bg`,
+  `--mzre-mention-active-border`, `--mzre-mention-color`, `--mzre-mention-bg`, `--mzre-mention-border`,
+  `--mzre-mention-hover-bg`, `--mzre-mention-hover-border`) to style every editor of a page from your
+  stylesheet. The defaults are the previous blue, so nothing changes unless you set them.
+
 ## [0.1.2] - 2026-11-20
 
 ### Fixed

@@ -170,7 +170,7 @@ import {EDITOR_CSS, injectStyleSheet, setEditorStyles} from './styles.js';
 import type {StyleOptions} from './styles.js';
 import {message as t, setEditorLocale, setEditorMessages} from './messages.js';
 import type {EditorLocale, EditorMessages} from './messages.js';
-import type {EditorIntegrations, EditorMentionIntegration, EditorUser,} from './types.js';
+import type {EditorIntegrations, EditorMentionIntegration, EditorUser, MentionColors} from './types.js';
 
 /** Interface text, escaped so it can be inserted into HTML. */
 const te = (key: keyof EditorMessages): string => escapeHtml(t(key));
@@ -199,6 +199,11 @@ export interface EditorOptions {
   mention?: boolean;
   /** Language of the interface and of the emojis: 'en' (default) or 'fr'. Page-wide setting. */
   locale?: EditorLocale;
+  /**
+   * Colors of the mention bubble and of the mention link, for this editor only (see `MentionColors`).
+   * They win over the `--mzre-mention-*` CSS variables of the page.
+   */
+  mentionColors?: MentionColors;
   /**
    * Style injection (page-wide setting): `{inject: false}` to load
    * `@mzeahmed/rich-editor/style.css` yourself, `{nonce}` for a nonce-based CSP. See `setEditorStyles()`.
@@ -229,9 +234,41 @@ interface MentionState {
   dismissed: {node: Text; offset: number} | null;
   /** Removes the scroll / resize listeners that keep the bubble next to the writing area. */
   stopFollow: (() => void) | null;
+  /** Colors the host asked for: the bubble is outside of the editor, so it carries its own copy. */
+  colors: MentionColors | undefined;
 }
 
 let mentionBubbleCount = 0;
+
+/** CSS custom property behind each color of `MentionColors` (see the "Mention colors" README section). */
+const MENTION_COLOR_VARIABLES: Record<keyof MentionColors, string> = {
+  active: '--mzre-mention-active-color',
+  activeBackground: '--mzre-mention-active-bg',
+  activeBorder: '--mzre-mention-active-border',
+  link: '--mzre-mention-color',
+  linkBackground: '--mzre-mention-bg',
+  linkBorder: '--mzre-mention-border',
+  linkHoverBackground: '--mzre-mention-hover-bg',
+  linkHoverBorder: '--mzre-mention-hover-border'
+};
+
+/** The link is inside the editor, the chosen-user colors belong to the bubble (appended to `<body>`). */
+const MENTION_LINK_COLORS: (keyof MentionColors)[] = ['link', 'linkBackground', 'linkBorder', 'linkHoverBackground', 'linkHoverBorder'];
+const MENTION_BUBBLE_COLORS: (keyof MentionColors)[] = ['active', 'activeBackground', 'activeBorder'];
+
+/**
+ * Sets the given colors on `element` as custom properties. It goes through the CSSOM
+ * (`style.setProperty`), which a strict CSP allows, unlike an inline `style` attribute in the markup.
+ * Empty and non-string values are ignored.
+ */
+function applyMentionColors (element: HTMLElement, colors: MentionColors | undefined, keys: (keyof MentionColors)[]): void {
+  if (!colors) return;
+
+  for (const key of keys) {
+    const value = colors[key];
+    if (typeof value === 'string' && value.trim() !== '') element.style.setProperty(MENTION_COLOR_VARIABLES[key], value.trim());
+  }
+}
 
 /**
  * ARIA attributes carried by the writing area (`textbox` role) while the mention bubble is
@@ -368,6 +405,8 @@ export default class Editor {
     wrap.className = 'mzre-editor-wrap';
     // Accessible name of the writing area: the textarea's aria-label, else its placeholder.
     wrap.innerHTML = Editor.buildEditorHTML(placeholder, toolbarMode!, textarea.getAttribute('aria-label') ?? '');
+
+    applyMentionColors(wrap, opts.mentionColors, MENTION_LINK_COLORS);
 
     textarea.parentNode!.insertBefore(wrap, textarea);
     textarea.style.display = 'none';
@@ -612,7 +651,7 @@ export default class Editor {
 
     if (opts.mention) {
       if (!integrations.mentions) throw new Error('Editor requires a mention integration.');
-      Editor._setupMentions(content, integrations.mentions);
+      Editor._setupMentions(content, integrations.mentions, opts.mentionColors);
     }
   }
 
@@ -689,7 +728,8 @@ export default class Editor {
 
   private static _setupMentions (
     content: HTMLElement,
-    integration: EditorMentionIntegration
+    integration: EditorMentionIntegration,
+    colors?: MentionColors
   ): void {
     const state: MentionState = {
       isSearch: false,
@@ -703,6 +743,7 @@ export default class Editor {
       stopOutsideClose: null,
       dismissed: null,
       stopFollow: null,
+      colors,
     };
 
     // In capture phase: before the editor's handler (otherwise Tab inserts spaces).
@@ -797,6 +838,7 @@ export default class Editor {
     dropdown.setAttribute('role', 'region');
     dropdown.setAttribute('aria-label', t('mentionSuggestions'));
     dropdown.hidden = true;
+    applyMentionColors(dropdown, state.colors, MENTION_BUBBLE_COLORS);
     state.listId = `mzre-mentions-list-${++mentionBubbleCount}`;
     dropdown.innerHTML = `
       <div class="mzre-mentions-header">
