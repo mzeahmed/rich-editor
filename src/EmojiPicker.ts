@@ -21,8 +21,8 @@ interface EmojiData {
   groups: EmojiGroup[];
 }
 
-const ROOT_CLASS = 'yoo-emoji-picker';
-const STYLE_ID = 'yoo-emoji-picker-styles';
+const ROOT_CLASS = 'mzre-emoji-picker';
+const STYLE_ID = 'mzre-emoji-picker-styles';
 
 /**
  * Chargeurs des données d'emojis, un par langue. Les imports sont écrits en toutes lettres : les
@@ -89,11 +89,11 @@ export default class EmojiPicker {
       ? document.activeElement
       : null;
 
-    const title = this.root!.querySelector<HTMLElement>('.yoo-emoji-picker__title');
-    const close = this.root!.querySelector<HTMLButtonElement>('.yoo-emoji-picker__close');
+    const title = this.root!.querySelector<HTMLElement>('.mzre-emoji-picker__title');
+    const close = this.root!.querySelector<HTMLButtonElement>('.mzre-emoji-picker__close');
     if (title) title.textContent = options.title ?? message('chooseEmoji');
     if (close) close.setAttribute('aria-label', options.closeLabel ?? message('close'));
-    this.root!.querySelector('.yoo-emoji-picker__tabs')?.setAttribute('aria-label', message('emojiCategories'));
+    this.root!.querySelector('.mzre-emoji-picker__tabs')?.setAttribute('aria-label', message('emojiCategories'));
 
     this.previousBodyOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -170,7 +170,7 @@ export default class EmojiPicker {
 
       this.data = data;
       this.dataLocale = locale;
-      const tabsContainer = root.querySelector<HTMLElement>('.yoo-emoji-picker__tabs')!;
+      const tabsContainer = root.querySelector<HTMLElement>('.mzre-emoji-picker__tabs')!;
       tabsContainer.replaceChildren();
       this.tabs = data.groups.map((group, index) => this.createTab(group, index, tabsContainer));
       this.activateGroup(0);
@@ -185,7 +185,7 @@ export default class EmojiPicker {
 
   private static setPanelMessage(message: string): void {
     const paragraph = document.createElement('p');
-    paragraph.className = 'yoo-emoji-picker__status';
+    paragraph.className = 'mzre-emoji-picker__status';
     paragraph.setAttribute('role', 'status');
     paragraph.textContent = message;
     this.panel?.replaceChildren(paragraph);
@@ -200,34 +200,34 @@ export default class EmojiPicker {
     root.className = ROOT_CLASS;
     root.hidden = true;
     root.innerHTML = `
-      <section class="yoo-emoji-picker__dialog" role="dialog" aria-modal="true" aria-labelledby="yoo-emoji-picker-title">
-        <header class="yoo-emoji-picker__header">
-          <h2 class="yoo-emoji-picker__title" id="yoo-emoji-picker-title">${escapeHtml(message('chooseEmoji'))}</h2>
-          <button class="yoo-emoji-picker__close" type="button" aria-label="${escapeHtml(message('close'))}">×</button>
+      <section class="mzre-emoji-picker__dialog" role="dialog" aria-modal="true" aria-labelledby="mzre-emoji-picker-title">
+        <header class="mzre-emoji-picker__header">
+          <h2 class="mzre-emoji-picker__title" id="mzre-emoji-picker-title">${escapeHtml(message('chooseEmoji'))}</h2>
+          <button class="mzre-emoji-picker__close" type="button" aria-label="${escapeHtml(message('close'))}">×</button>
         </header>
-        <div class="yoo-emoji-picker__tabs" role="tablist" aria-label="${escapeHtml(message('emojiCategories'))}"></div>
-        <div class="yoo-emoji-picker__panel" role="tabpanel" tabindex="0"></div>
+        <div class="mzre-emoji-picker__tabs" role="tablist" aria-label="${escapeHtml(message('emojiCategories'))}"></div>
+        <div class="mzre-emoji-picker__panel" role="tabpanel" tabindex="0"></div>
       </section>
     `;
 
     root.addEventListener('click', event => {
       if (event.target === root) this.close();
     });
-    root.querySelector('.yoo-emoji-picker__close')?.addEventListener('click', () => this.close());
+    root.querySelector('.mzre-emoji-picker__close')?.addEventListener('click', () => this.close());
 
     this.root = root;
-    this.panel = root.querySelector<HTMLElement>('.yoo-emoji-picker__panel');
+    this.panel = root.querySelector<HTMLElement>('.mzre-emoji-picker__panel');
     document.body.appendChild(root);
   }
 
   private static createTab(group: EmojiGroup, index: number, container: HTMLElement): HTMLButtonElement {
     const tab = document.createElement('button');
     tab.type = 'button';
-    tab.className = 'yoo-emoji-picker__tab';
-    tab.id = `yoo-emoji-tab-${group.key}`;
+    tab.className = 'mzre-emoji-picker__tab';
+    tab.id = `mzre-emoji-tab-${group.key}`;
     tab.setAttribute('role', 'tab');
     tab.setAttribute('aria-selected', String(index === 0));
-    tab.setAttribute('aria-controls', 'yoo-emoji-picker-panel');
+    tab.setAttribute('aria-controls', 'mzre-emoji-picker-panel');
     tab.tabIndex = index === 0 ? 0 : -1;
     tab.textContent = group.message;
     tab.addEventListener('click', () => this.activateGroup(index));
@@ -245,14 +245,14 @@ export default class EmojiPicker {
       tab.setAttribute('aria-selected', String(tabIndex === index));
       tab.tabIndex = tabIndex === index ? 0 : -1;
     });
-    this.panel.id = 'yoo-emoji-picker-panel';
-    this.panel.setAttribute('aria-labelledby', `yoo-emoji-tab-${group.key}`);
+    this.panel.id = 'mzre-emoji-picker-panel';
+    this.panel.setAttribute('aria-labelledby', `mzre-emoji-tab-${group.key}`);
     this.panel.replaceChildren();
 
     this.data!.emojis.filter(emoji => emoji.group === group.order).forEach(emoji => {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'yoo-emoji-picker__item';
+      button.className = 'mzre-emoji-picker__item';
       button.textContent = emoji.emoji;
       button.title = emoji.label;
       button.setAttribute('aria-label', emoji.label);

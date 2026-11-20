@@ -1,7 +1,7 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import EmojiPicker from '../src/EmojiPicker.js';
 
-const panel = (): HTMLElement => document.querySelector<HTMLElement>('.yoo-emoji-picker__panel')!;
+const panel = (): HTMLElement => document.querySelector<HTMLElement>('.mzre-emoji-picker__panel')!;
 const tabs = (): HTMLButtonElement[] => Array.from(document.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
 
 describe('EmojiPicker : chargement à la demande des emojis', () => {
@@ -21,15 +21,15 @@ describe('EmojiPicker : chargement à la demande des emojis', () => {
   it('affiche la fenêtre aussitôt avec un état de chargement, puis les emojis', async () => {
     const ready = EmojiPicker.open({onSelect: vi.fn()});
 
-    expect(document.querySelector<HTMLElement>('.yoo-emoji-picker')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>('.mzre-emoji-picker')?.hidden).toBe(false);
     expect(panel().getAttribute('aria-busy')).toBe('true');
     expect(panel().querySelector('[role="status"]')?.textContent).toContain('Loading');
-    expect(document.querySelectorAll('.yoo-emoji-picker__item')).toHaveLength(0);
+    expect(document.querySelectorAll('.mzre-emoji-picker__item')).toHaveLength(0);
 
     await ready;
 
     expect(panel().hasAttribute('aria-busy')).toBe(false);
-    expect(document.querySelectorAll('.yoo-emoji-picker__item').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('.mzre-emoji-picker__item').length).toBeGreaterThan(0);
     expect(tabs().length).toBeGreaterThan(1);
     expect(document.activeElement).toBe(tabs()[0]);
   });
@@ -77,7 +77,7 @@ describe('EmojiPicker : chargement à la demande des emojis', () => {
     await Picker.open({onSelect: vi.fn()});
 
     expect(attempts).toBe(2);
-    expect(document.querySelectorAll('.yoo-emoji-picker__item')).toHaveLength(1);
+    expect(document.querySelectorAll('.mzre-emoji-picker__item')).toHaveLength(1);
     Picker.destroy();
   });
 });

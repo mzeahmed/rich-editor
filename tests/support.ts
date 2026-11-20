@@ -40,7 +40,7 @@ export function mountEditor(users: EditorUser[] = USERS, initialValue = ''): HTM
     }
   });
 
-  return document.querySelector<HTMLElement>('.yoo-content')!;
+  return document.querySelector<HTMLElement>('.mzre-content')!;
 }
 
 /** Saisie dans le même nœud texte (un nœud remplacé fermerait la bulle) et touche relâchée. */
@@ -64,6 +64,6 @@ export async function openMentionBubble(content: HTMLElement): Promise<void> {
   type(content, '@le');
 
   await vi.waitFor(() =>
-    expect(document.querySelector('.yoo-mention-item, .yoo-mentions-empty')).not.toBeNull()
+    expect(document.querySelector('.mzre-mention-item, .mzre-mentions-empty')).not.toBeNull()
   );
 }

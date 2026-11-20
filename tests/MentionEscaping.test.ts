@@ -3,7 +3,7 @@ import type {EditorUser} from '../src/types.js';
 import {mountEditor, openMentionBubble, USERS} from './support.js';
 
 const user = (overrides: Partial<EditorUser>): EditorUser => ({...USERS[0], ...overrides});
-const items = (): HTMLElement[] => Array.from(document.querySelectorAll<HTMLElement>('.yoo-mention-item'));
+const items = (): HTMLElement[] => Array.from(document.querySelectorAll<HTMLElement>('.mzre-mention-item'));
 
 describe('bulle des mentions : données de l’application hôte', () => {
   afterEach(() => {
@@ -17,8 +17,8 @@ describe('bulle des mentions : données de l’application hôte', () => {
     const content = mountEditor([user({firstName: hostile, lastName: '<b>Martin</b>'})]);
     await openMentionBubble(content);
 
-    const dropdown = document.querySelector('.yoo-mentions-dropdown')!;
-    expect(dropdown.querySelector('.yoo-mention-name')!.textContent).toBe(`${hostile} <b>Martin</b>`);
+    const dropdown = document.querySelector('.mzre-mentions-dropdown')!;
+    expect(dropdown.querySelector('.mzre-mention-name')!.textContent).toBe(`${hostile} <b>Martin</b>`);
     expect(dropdown.querySelector('img[onerror], b')).toBeNull();
     expect((window as unknown as {__xss?: number}).__xss).toBeUndefined();
   });
@@ -36,15 +36,15 @@ describe('bulle des mentions : données de l’application hôte', () => {
     const content = mountEditor([user({avatarUrl: 'javascript:alert(1)'})]);
     await openMentionBubble(content);
 
-    expect(document.querySelector('.yoo-mention-avatar img')).toBeNull();
-    expect(document.querySelector('.yoo-mention-avatar-fallback')!.textContent).toBe('LM');
+    expect(document.querySelector('.mzre-mention-avatar img')).toBeNull();
+    expect(document.querySelector('.mzre-mention-avatar-fallback')!.textContent).toBe('LM');
   });
 
   it('affiche l’avatar quand l’adresse est en http(s)', async () => {
     const content = mountEditor([user({avatarUrl: 'https://exemple.test/lea.png'})]);
     await openMentionBubble(content);
 
-    expect(document.querySelector<HTMLImageElement>('.yoo-mention-avatar img')!.src).toBe('https://exemple.test/lea.png');
+    expect(document.querySelector<HTMLImageElement>('.mzre-mention-avatar img')!.src).toBe('https://exemple.test/lea.png');
   });
 
   it('ne propose jamais un chemin de profil qui désigne un autre domaine', async () => {
@@ -71,7 +71,7 @@ describe('bulle des mentions : données de l’application hôte', () => {
     await openMentionBubble(content);
 
     expect(items()).toHaveLength(0);
-    expect(document.querySelector('.yoo-mentions-empty')).not.toBeNull();
+    expect(document.querySelector('.mzre-mentions-empty')).not.toBeNull();
   });
 });
 

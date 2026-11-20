@@ -66,7 +66,7 @@ Passed as the second argument of `Editor.mount()` / `Editor.init()`.
 | `onChange` | `(change: EditorChange) => void` | – | Called on every change and once at mount. |
 
 A few options can also be set per textarea with data attributes, which take precedence:
-`data-yoo-toolbar="toggle"`, `data-yoo-min-height="100px"`, `data-yoo-max-height="400px"`.
+`data-mzre-toolbar="toggle"`, `data-mzre-min-height="100px"`, `data-mzre-max-height="400px"`.
 
 The third argument carries the [integrations](#mentions) (`mentions`, `messages`).
 
@@ -111,7 +111,7 @@ const mentions: EditorMentionIntegration = {
     freezeElement: (element) => element.setAttribute('aria-busy', 'true'),
     unfreezeElement: () =>
       document
-        .querySelectorAll('.yoo-mentions-dropdown[aria-busy="true"]')
+        .querySelectorAll('.mzre-mentions-dropdown[aria-busy="true"]')
         .forEach((element) => element.removeAttribute('aria-busy')),
   },
   // Return RAW text: the editor escapes names, ids and URLs itself.

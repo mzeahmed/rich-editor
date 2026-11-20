@@ -19,7 +19,7 @@ First public release.
   `contenteditable`; the textarea keeps the editor's HTML as its value.
 - Options: `toolbar` (`always`, `toggle`, `focus`, `never`), `footer`, `minHeight`, `maxHeight`,
   `emoji`, `mention`, `locale`, `styles`, `onChange`, plus `selector` / `exclude` for `init()`.
-  `data-yoo-toolbar`, `data-yoo-min-height` and `data-yoo-max-height` override them per textarea.
+  `data-mzre-toolbar`, `data-mzre-min-height` and `data-mzre-max-height` override them per textarea.
 - `onChange({html, text, isEmpty})`, called at mount and on every change (typing, toolbar,
   mention), for example to enable or disable a "publish" button.
 - `@mentions`: a suggestion bubble fed by your `searchUsers()` integration. It closes with its

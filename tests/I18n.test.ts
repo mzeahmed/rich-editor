@@ -32,15 +32,15 @@ describe('langue et textes de l’interface', () => {
     Editor.mount(textarea(), {});
 
     expect(title('bold')).toBe('Bold');
-    expect(document.querySelector('.yoo-charcount')?.textContent).toContain('character');
-    expect(document.querySelector('.yoo-content')?.getAttribute('data-placeholder')).toBe('Write here…');
+    expect(document.querySelector('.mzre-charcount')?.textContent).toContain('character');
+    expect(document.querySelector('.mzre-content')?.getAttribute('data-placeholder')).toBe('Write here…');
   });
 
   it('passe en français avec l’option locale', () => {
     Editor.mount(textarea(), {locale: 'fr'});
 
     expect(title('bold')).toBe('Gras');
-    expect(document.querySelector('.yoo-content')?.getAttribute('data-placeholder')).toBe('Écrivez ici…');
+    expect(document.querySelector('.mzre-content')?.getAttribute('data-placeholder')).toBe('Écrivez ici…');
   });
 
   it('ignore une langue inconnue', () => {
@@ -53,28 +53,28 @@ describe('langue et textes de l’interface', () => {
     Editor.mount(textarea(), {}, {messages: {bold: '"><img src=x onerror="window.__xss=1"> Gras'}});
 
     expect(title('bold')).toBe('"><img src=x onerror="window.__xss=1"> Gras');
-    expect(document.querySelector('.yoo-toolbar img')).toBeNull();
+    expect(document.querySelector('.mzre-toolbar img')).toBeNull();
     expect((window as unknown as {__xss?: number}).__xss).toBeUndefined();
   });
 
   it('échappe aussi le placeholder du textarea', () => {
     Editor.mount(textarea('"><img src=x onerror="window.__xss=2">'), {});
 
-    expect(document.querySelector('.yoo-content')?.getAttribute('data-placeholder')).toBe('"><img src=x onerror="window.__xss=2">');
-    expect(document.querySelector('.yoo-editor-wrap img')).toBeNull();
+    expect(document.querySelector('.mzre-content')?.getAttribute('data-placeholder')).toBe('"><img src=x onerror="window.__xss=2">');
+    expect(document.querySelector('.mzre-editor-wrap img')).toBeNull();
   });
 
   it('fournit les emojis et les textes du sélecteur dans la langue courante, et suit un changement', async () => {
     await EmojiPicker.open({onSelect: vi.fn()});
     const english = tabLabels();
-    expect(document.querySelector('.yoo-emoji-picker__title')?.textContent).toBe('Choose an emoji');
-    expect(document.querySelector('.yoo-emoji-picker__tabs')?.getAttribute('aria-label')).toBe('Emoji categories');
+    expect(document.querySelector('.mzre-emoji-picker__title')?.textContent).toBe('Choose an emoji');
+    expect(document.querySelector('.mzre-emoji-picker__tabs')?.getAttribute('aria-label')).toBe('Emoji categories');
     EmojiPicker.close();
 
     setEditorLocale('fr');
     await EmojiPicker.open({onSelect: vi.fn()});
 
-    expect(document.querySelector('.yoo-emoji-picker__title')?.textContent).toBe('Choisir un emoji');
+    expect(document.querySelector('.mzre-emoji-picker__title')?.textContent).toBe('Choisir un emoji');
     expect(tabLabels()).not.toEqual(english);
     expect(tabLabels()).toHaveLength(english.length);
     expect(document.querySelectorAll('[role="tab"]')).toHaveLength(english.length);
@@ -96,7 +96,7 @@ describe('option onChange (remplace le sélecteur .ys-create-post-btn)', () => {
   it('est appelée au montage puis à chaque modification, avec l’état du contenu', () => {
     const onChange = vi.fn();
     Editor.mount(textarea(), {onChange});
-    const content = document.querySelector<HTMLElement>('.yoo-content')!;
+    const content = document.querySelector<HTMLElement>('.mzre-content')!;
 
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenLastCalledWith({html: '', text: '', isEmpty: true});

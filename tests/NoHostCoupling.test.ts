@@ -13,6 +13,7 @@ const SOURCES = readdirSync(new URL('../src/', import.meta.url))
 describe('code source du paquet', () => {
   it.each([
     ['yoostart', /yoostart/i],
+    ['préfixe « yoo » (ancien nom)', /\byoo|\.yoo|yoo-|data-yoo/i],
     ['wordpress', /wordpress/i],
     ['quill', /quill/i],
     ['bootstrap', /bootstrap|\bbs\./i],

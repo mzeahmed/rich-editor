@@ -9,9 +9,9 @@ const TWO_USERS: EditorUser[] = [
 ];
 
 const attr = (element: Element | null, name: string): string | null => element?.getAttribute(name) ?? null;
-const bubble = (): HTMLElement | null => document.querySelector<HTMLElement>('.yoo-mentions-dropdown');
-const options = (): HTMLElement[] => Array.from(document.querySelectorAll<HTMLElement>('.yoo-mention-item'));
-const status = (): string => document.querySelector('.yoo-mentions-dropdown [role="status"]')?.textContent ?? '';
+const bubble = (): HTMLElement | null => document.querySelector<HTMLElement>('.mzre-mentions-dropdown');
+const options = (): HTMLElement[] => Array.from(document.querySelectorAll<HTMLElement>('.mzre-mention-item'));
+const status = (): string => document.querySelector('.mzre-mentions-dropdown [role="status"]')?.textContent ?? '';
 
 /** Touche pressée dans la zone de saisie ; renvoie l'événement pour lire `defaultPrevented`. */
 function press(content: HTMLElement, key: string, init: KeyboardEventInit = {}): KeyboardEvent {
@@ -47,7 +47,7 @@ describe('bulle des mentions : accessibilité', () => {
 
     expect(attr(bubble(), 'role')).toBe('region');
     expect(attr(bubble(), 'aria-label')).toBe('Mention suggestions');
-    expect(attr(document.querySelector('.yoo-block-select'), 'aria-label')).toBe('Text style');
+    expect(attr(document.querySelector('.mzre-block-select'), 'aria-label')).toBe('Text style');
   });
 
   it('expose une liste d’options liée à la zone de saisie', async () => {
@@ -67,7 +67,7 @@ describe('bulle des mentions : accessibilité', () => {
     options().forEach((option) => {
       expect(attr(option, 'role')).toBe('option');
       expect(attr(option, 'aria-selected')).toBe('false');
-      expect(option.id).toMatch(/^yoo-mentions-list-\d+-option-\d+$/);
+      expect(option.id).toMatch(/^mzre-mentions-list-\d+-option-\d+$/);
       expect(option.hasAttribute('tabindex')).toBe(false);
     });
     expect(new Set(options().map((option) => option.id)).size).toBe(2);
@@ -87,12 +87,12 @@ describe('bulle des mentions : accessibilité', () => {
   it('annonce le nombre de suggestions, ou l’absence de résultat, dans une zone qui existe avant', async () => {
     const content = mountEditor(TWO_USERS);
     type(content, '@');
-    const region = document.querySelector('.yoo-mentions-dropdown [role="status"]');
+    const region = document.querySelector('.mzre-mentions-dropdown [role="status"]');
     expect(region).not.toBeNull();
 
     type(content, '@le');
     await vi.waitFor(() => expect(status()).toContain('2 suggestions available'));
-    expect(document.querySelector('.yoo-mentions-dropdown [role="status"]')).toBe(region);
+    expect(document.querySelector('.mzre-mentions-dropdown [role="status"]')).toBe(region);
 
     document.body.innerHTML = '';
     const empty = mountEditor([]);
@@ -209,7 +209,7 @@ describe('bulle des mentions : accessibilité', () => {
     await openMentionBubble(content);
     press(content, 'ArrowDown');
 
-    document.querySelector<HTMLButtonElement>('.yoo-mentions-close')!.click();
+    document.querySelector<HTMLButtonElement>('.mzre-mentions-close')!.click();
 
     expect(bubble()).toBeNull();
     expect(content.hasAttribute('aria-activedescendant')).toBe(false);
@@ -231,7 +231,7 @@ describe('bulle des mentions : accessibilité', () => {
     const content = mountEditor(USERS);
     await openMentionBubble(content);
 
-    expect(attr(document.querySelector('.yoo-mention-avatar img'), 'alt')).toBe('');
-    expect(document.querySelector('.yoo-mention-name')?.textContent).toBe('Léa Martin');
+    expect(attr(document.querySelector('.mzre-mention-avatar img'), 'alt')).toBe('');
+    expect(document.querySelector('.mzre-mention-name')?.textContent).toBe('Léa Martin');
   });
 });

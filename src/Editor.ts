@@ -36,7 +36,7 @@
  *    Editor.init({ toolbar: 'never' });
  *
  * Surcharge par textarea individuel via attribut data :
- *    <textarea data-yoo-toolbar="focus"></textarea>
+ *    <textarea data-mzre-toolbar="focus"></textarea>
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * FOOTER (compteur de caractères + boutons HTML / Effacer / Copier)
@@ -53,7 +53,7 @@
  *    Editor.mount('#my-textarea', { minHeight: '80px', maxHeight: '300px' });
  *
  * Via attributs data sur le <textarea> (prioritaires sur les options JS) :
- *    <textarea data-yoo-min-height="60px" data-yoo-max-height="200px"></textarea>
+ *    <textarea data-mzre-min-height="60px" data-mzre-max-height="200px"></textarea>
  *
  * Quand maxHeight est défini, overflow-y: auto est activé automatiquement.
  *
@@ -148,9 +148,9 @@
  *
  * F) Surcharge par textarea individuel (attributs data, sans JS supplémentaire)
  *    <textarea
- *      data-yoo-toolbar="toggle"
- *      data-yoo-min-height="100px"
- *      data-yoo-max-height="400px"
+ *      data-mzre-toolbar="toggle"
+ *      data-mzre-min-height="100px"
+ *      data-mzre-max-height="400px"
  *    ></textarea>
  *    puis : Editor.init();   ← les attributs data prennent le dessus
  *
@@ -261,7 +261,7 @@ export default class Editor {
      Inject CSS une seule fois
   ───────────────────────────────────────── */
   private static injectStyles (): void {
-    injectStyleSheet('yoo-editor-styles', EDITOR_CSS);
+    injectStyleSheet('mzre-editor-styles', EDITOR_CSS);
   }
 
   /* ─────────────────────────────────────────
@@ -269,8 +269,8 @@ export default class Editor {
   ───────────────────────────────────────── */
   private static buildEditorHTML (placeholder: string, toolbarMode: string, label: string): string {
     const toggleBar = toolbarMode === 'toggle'
-      ? `<div class="yoo-toolbar-toggle">
-           <button type="button" class="yoo-toggle-btn" title="${te('toggleToolbar')}">
+      ? `<div class="mzre-toolbar-toggle">
+           <button type="button" class="mzre-toggle-btn" title="${te('toggleToolbar')}">
              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect y="0" width="12" height="1.5" rx=".75" fill="currentColor"/><rect y="4" width="12" height="1.5" rx=".75" fill="currentColor"/><rect y="8" width="12" height="1.5" rx=".75" fill="currentColor"/></svg>
              ${te('formatting')}
            </button>
@@ -282,46 +282,46 @@ export default class Editor {
     // <form> vaut implicitement type="submit" et soumet le formulaire hôte
     // au clic (ex. FeedComposer.tsx) au lieu d'exécuter sa commande d'édition.
     const toolbarAndLinkBar = toolbarMode !== 'never' ? `
-      <div class="yoo-toolbar">
-        <select class="yoo-block-select" aria-label="${te('textStyle')}">
+      <div class="mzre-toolbar">
+        <select class="mzre-block-select" aria-label="${te('textStyle')}">
           <option value="p">${te('paragraph')}</option>
           <option value="h2">${te('heading')}</option>
           <option value="h3">${te('subheading')}</option>
           <option value="blockquote">${te('quote')}</option>
         </select>
-        <div class="yoo-sep"></div>
+        <div class="mzre-sep"></div>
         <button type="button" data-cmd="bold"               title="${te('bold')}"><b>B</b></button>
         <button type="button" data-cmd="italic"             title="${te('italic')}"><i>I</i></button>
-        <button type="button" data-cmd="underline"          title="${te('underline')}" class="yoo-btn-underline">U</button>
-        <button type="button" data-cmd="strikeThrough"      title="${te('strikethrough')}" class="yoo-btn-strike">S</button>
-        <div class="yoo-sep"></div>
+        <button type="button" data-cmd="underline"          title="${te('underline')}" class="mzre-btn-underline">U</button>
+        <button type="button" data-cmd="strikeThrough"      title="${te('strikethrough')}" class="mzre-btn-strike">S</button>
+        <div class="mzre-sep"></div>
         <button type="button" data-cmd="insertUnorderedList" title="${te('bulletList')}">${ICONS.ul}</button>
         <button type="button" data-cmd="insertOrderedList"   title="${te('numberedList')}">${ICONS.ol}</button>
-        <div class="yoo-sep"></div>
+        <div class="mzre-sep"></div>
         <button type="button" data-cmd="justifyLeft"   title="${te('alignLeft')}">${ICONS.alignL}</button>
         <button type="button" data-cmd="justifyCenter" title="${te('alignCenter')}">${ICONS.alignC}</button>
         <button type="button" data-cmd="justifyRight"  title="${te('alignRight')}">${ICONS.alignR}</button>
-        <div class="yoo-sep"></div>
+        <div class="mzre-sep"></div>
         <button type="button" data-action="link"        title="${te('insertLink')}">${ICONS.link}</button>
         <button type="button" data-cmd="removeFormat"   title="${te('clearFormatting')}">${ICONS.clear}</button>
-        <div class="yoo-sep"></div>
+        <div class="mzre-sep"></div>
         <button type="button" data-cmd="undo"  title="${te('undo')}">${ICONS.undo}</button>
         <button type="button" data-cmd="redo"  title="${te('redo')}">${ICONS.redo}</button>
       </div>
 
-      <div class="yoo-link-bar">
-        <input type="text" class="yoo-link-input" placeholder="https://" />
-        <button type="button" class="yoo-btn-insert">${te('insert')}</button>
-        <button type="button" class="yoo-btn-remove">${te('remove')}</button>
-        <button type="button" class="yoo-btn-close">×</button>
+      <div class="mzre-link-bar">
+        <input type="text" class="mzre-link-input" placeholder="https://" />
+        <button type="button" class="mzre-btn-insert">${te('insert')}</button>
+        <button type="button" class="mzre-btn-remove">${te('remove')}</button>
+        <button type="button" class="mzre-btn-close">×</button>
       </div>` : '';
 
     return `
       ${toggleBar}
       ${toolbarAndLinkBar}
 
-      <div class="yoo-content-wrap"><div
-        class="yoo-content"
+      <div class="mzre-content-wrap"><div
+        class="mzre-content"
         contenteditable="true"
         role="textbox"
         aria-multiline="true"
@@ -329,14 +329,14 @@ export default class Editor {
         data-placeholder="${escapeHtml(placeholder) || te('placeholder')}"
       ></div></div>
 
-      <div class="yoo-export-box"></div>
+      <div class="mzre-export-box"></div>
 
-      <div class="yoo-footer">
-        <span class="yoo-charcount">0 ${te('character')}</span>
-        <div class="yoo-footer-actions">
-          <button type="button" class="yoo-btn-action yoo-btn-html">${te('html')}</button>
-          <button type="button" class="yoo-btn-action yoo-btn-clear">${te('clear')}</button>
-          <button type="button" class="yoo-btn-primary yoo-btn-copy">${te('copyContent')}</button>
+      <div class="mzre-footer">
+        <span class="mzre-charcount">0 ${te('character')}</span>
+        <div class="mzre-footer-actions">
+          <button type="button" class="mzre-btn-action mzre-btn-html">${te('html')}</button>
+          <button type="button" class="mzre-btn-action mzre-btn-clear">${te('clear')}</button>
+          <button type="button" class="mzre-btn-primary mzre-btn-copy">${te('copyContent')}</button>
         </div>
       </div>
     `;
@@ -346,43 +346,43 @@ export default class Editor {
      Monte l'éditeur sur un <textarea>
   ───────────────────────────────────────── */
   private static mountEditor (textarea: HTMLTextAreaElement, opts: EditorOptions = {}, integrations: EditorIntegrations = {}): void {
-    if (textarea.dataset.yooMounted) return;
+    if (textarea.dataset.mzreMounted) return;
 
     if (opts.locale) setEditorLocale(opts.locale);
     if (integrations.messages) setEditorMessages(integrations.messages);
 
-    textarea.dataset.yooMounted = 'true';
+    textarea.dataset.mzreMounted = 'true';
 
     const placeholder = textarea.getAttribute('placeholder') ?? '';
     const initialValue = textarea.value ?? '';
-    const toolbarMode = (textarea.dataset.yooToolbar ?? opts.toolbar ?? 'always') as EditorOptions['toolbar'];
+    const toolbarMode = (textarea.dataset.mzreToolbar ?? opts.toolbar ?? 'always') as EditorOptions['toolbar'];
     const showFooter = opts.footer !== false;
-    const minHeight = textarea.dataset.yooMinHeight ?? opts.minHeight ?? null;
-    const maxHeight = textarea.dataset.yooMaxHeight ?? opts.maxHeight ?? null;
+    const minHeight = textarea.dataset.mzreMinHeight ?? opts.minHeight ?? null;
+    const maxHeight = textarea.dataset.mzreMaxHeight ?? opts.maxHeight ?? null;
 
     const wrap = document.createElement('div');
-    wrap.className = 'yoo-editor-wrap';
+    wrap.className = 'mzre-editor-wrap';
     // Nom accessible de la zone de saisie : l'aria-label du textarea, sinon son placeholder.
     wrap.innerHTML = Editor.buildEditorHTML(placeholder, toolbarMode!, textarea.getAttribute('aria-label') ?? '');
 
     textarea.parentNode!.insertBefore(wrap, textarea);
     textarea.style.display = 'none';
 
-    const content = wrap.querySelector<HTMLElement>('.yoo-content')!;
-    const toolbar = wrap.querySelector<HTMLElement>('.yoo-toolbar');
-    const linkBar = wrap.querySelector<HTMLElement>('.yoo-link-bar');
-    const linkInput = wrap.querySelector<HTMLInputElement>('.yoo-link-input');
-    const exportBox = wrap.querySelector<HTMLElement>('.yoo-export-box')!;
-    const charCount = wrap.querySelector<HTMLElement>('.yoo-charcount')!;
-    const blockSelect = wrap.querySelector<HTMLSelectElement>('.yoo-block-select');
-    const btnHtml = wrap.querySelector<HTMLButtonElement>('.yoo-btn-html')!;
-    const btnClear = wrap.querySelector<HTMLButtonElement>('.yoo-btn-clear')!;
-    const btnCopy = wrap.querySelector<HTMLButtonElement>('.yoo-btn-copy')!;
-    const toggleBtn = wrap.querySelector<HTMLButtonElement>('.yoo-toggle-btn');
+    const content = wrap.querySelector<HTMLElement>('.mzre-content')!;
+    const toolbar = wrap.querySelector<HTMLElement>('.mzre-toolbar');
+    const linkBar = wrap.querySelector<HTMLElement>('.mzre-link-bar');
+    const linkInput = wrap.querySelector<HTMLInputElement>('.mzre-link-input');
+    const exportBox = wrap.querySelector<HTMLElement>('.mzre-export-box')!;
+    const charCount = wrap.querySelector<HTMLElement>('.mzre-charcount')!;
+    const blockSelect = wrap.querySelector<HTMLSelectElement>('.mzre-block-select');
+    const btnHtml = wrap.querySelector<HTMLButtonElement>('.mzre-btn-html')!;
+    const btnClear = wrap.querySelector<HTMLButtonElement>('.mzre-btn-clear')!;
+    const btnCopy = wrap.querySelector<HTMLButtonElement>('.mzre-btn-copy')!;
+    const toggleBtn = wrap.querySelector<HTMLButtonElement>('.mzre-toggle-btn');
 
     // Masquer le footer si demandé
     if (!showFooter) {
-      const footer = wrap.querySelector<HTMLElement>('.yoo-footer');
+      const footer = wrap.querySelector<HTMLElement>('.mzre-footer');
       if (footer) footer.style.display = 'none';
       exportBox.style.display = 'none';
     }
@@ -400,21 +400,21 @@ export default class Editor {
     const showToolbar = (): void => {
       if (!toolbar) return;
 
-      toolbar.classList.remove('yoo-toolbar-anim-hide');
-      toolbar.classList.add('yoo-toolbar-anim-show');
-      wrap.classList.remove('yoo-toolbar-hidden');
-      wrap.classList.add('yoo-toolbar-visible');
-      toggleBtn?.classList.add('yoo-active');
+      toolbar.classList.remove('mzre-toolbar-anim-hide');
+      toolbar.classList.add('mzre-toolbar-anim-show');
+      wrap.classList.remove('mzre-toolbar-hidden');
+      wrap.classList.add('mzre-toolbar-visible');
+      toggleBtn?.classList.add('mzre-active');
     };
 
     const hideToolbar = (): void => {
       if (!toolbar) return;
 
-      toolbar.classList.remove('yoo-toolbar-anim-show');
-      toolbar.classList.add('yoo-toolbar-anim-hide');
-      wrap.classList.remove('yoo-toolbar-visible');
-      wrap.classList.add('yoo-toolbar-hidden');
-      toggleBtn?.classList.remove('yoo-active');
+      toolbar.classList.remove('mzre-toolbar-anim-show');
+      toolbar.classList.add('mzre-toolbar-anim-hide');
+      wrap.classList.remove('mzre-toolbar-visible');
+      wrap.classList.add('mzre-toolbar-hidden');
+      toggleBtn?.classList.remove('mzre-active');
     };
 
     // toolbarMode 'never' : toolbar absent du DOM, rien à faire
@@ -428,7 +428,7 @@ export default class Editor {
     } else if (toolbarMode === 'toggle') {
       hideToolbar();
       toggleBtn!.addEventListener('click', () => {
-        wrap.classList.contains('yoo-toolbar-visible') ? hideToolbar() : showToolbar();
+        wrap.classList.contains('mzre-toolbar-visible') ? hideToolbar() : showToolbar();
       });
     } else if (toolbarMode !== 'never') {
       showToolbar();
@@ -485,7 +485,7 @@ export default class Editor {
       ]);
       toolbar.querySelectorAll<HTMLButtonElement>('button[data-cmd]').forEach(btn => {
         if (stateCmds.has(btn.dataset.cmd!)) {
-          btn.classList.toggle('yoo-active', document.queryCommandState(btn.dataset.cmd!));
+          btn.classList.toggle('mzre-active', document.queryCommandState(btn.dataset.cmd!));
         }
       });
       const block = document.queryCommandValue('formatBlock').toLowerCase();
@@ -518,11 +518,11 @@ export default class Editor {
       const visible = exportBox.style.display !== 'none' && exportBox.style.display !== '';
       if (visible) {
         exportBox.style.display = 'none';
-        btnHtml.classList.remove('yoo-active');
+        btnHtml.classList.remove('mzre-active');
       } else {
         exportBox.textContent = content.innerHTML;
         exportBox.style.display = 'block';
-        btnHtml.classList.add('yoo-active');
+        btnHtml.classList.add('mzre-active');
       }
     };
 
@@ -563,12 +563,12 @@ export default class Editor {
 
     /* ── Événements barre de lien (absent en mode 'never') ── */
     if (linkBar && linkInput) {
-      wrap.querySelector('.yoo-btn-insert')!.addEventListener('click', insertLink);
-      wrap.querySelector('.yoo-btn-remove')!.addEventListener('click', () => {
+      wrap.querySelector('.mzre-btn-insert')!.addEventListener('click', insertLink);
+      wrap.querySelector('.mzre-btn-remove')!.addEventListener('click', () => {
         exec('unlink');
         closeLinkBar();
       });
-      wrap.querySelector('.yoo-btn-close')!.addEventListener('click', closeLinkBar);
+      wrap.querySelector('.mzre-btn-close')!.addEventListener('click', closeLinkBar);
       linkInput.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') insertLink(); });
     }
 
@@ -619,7 +619,7 @@ export default class Editor {
   private static _addEmojiInEditor (content: HTMLElement, wrap: HTMLElement): void {
     const button = document.createElement('button');
     button.textContent = '😊';
-    button.className = 'yoo-emoji-button';
+    button.className = 'mzre-emoji-button';
     button.type = 'button';
     button.title = t('addEmoji');
     button.setAttribute('aria-label', t('addEmoji'));
@@ -634,7 +634,7 @@ export default class Editor {
       Editor._showEmojiPicker(content, savedRange);
     });
 
-    const contentWrap = wrap.querySelector<HTMLElement>('.yoo-content-wrap');
+    const contentWrap = wrap.querySelector<HTMLElement>('.mzre-content-wrap');
     if (contentWrap) {
       contentWrap.style.position = contentWrap.style.position || 'relative';
       contentWrap.appendChild(button);
@@ -765,7 +765,7 @@ export default class Editor {
 
   /**
    * Crée la bulle sur document.body en position fixed — contourne overflow:hidden de
-   * .yoo-editor-wrap, identique au pattern du picker emoji. Positionnée au bas de la zone de saisie,
+   * .mzre-editor-wrap, identique au pattern du picker emoji. Positionnée au bas de la zone de saisie,
    * décalée vers le haut si besoin.
    *
    * Sa structure est posée une fois : en-tête avec la croix, zone d'annonce pour les lecteurs
@@ -778,29 +778,29 @@ export default class Editor {
     integration: EditorMentionIntegration
   ): HTMLElement {
     const dropdown = document.createElement('div');
-    dropdown.className = 'yoo-mentions-dropdown';
+    dropdown.className = 'mzre-mentions-dropdown';
     // Repère nommé : le contenu de la bulle, ajoutée à la fin de la page, n'est sinon dans aucun repère.
     dropdown.setAttribute('role', 'region');
     dropdown.setAttribute('aria-label', t('mentionSuggestions'));
     dropdown.hidden = true;
-    state.listId = `yoo-mentions-list-${++mentionBubbleCount}`;
+    state.listId = `mzre-mentions-list-${++mentionBubbleCount}`;
     dropdown.innerHTML = `
-      <div class="yoo-mentions-header">
-        <button type="button" class="yoo-mentions-close" aria-label="${te('close')}">×</button>
+      <div class="mzre-mentions-header">
+        <button type="button" class="mzre-mentions-close" aria-label="${te('close')}">×</button>
       </div>
-      <div class="yoo-sr-only" role="status" aria-live="polite"></div>
-      <div class="yoo-mentions-results"></div>`;
+      <div class="mzre-sr-only" role="status" aria-live="polite"></div>
+      <div class="mzre-mentions-results"></div>`;
 
     // Garde le focus dans la zone de saisie quand on appuie sur la croix : la fermeture se fait sur
     // le clic, traité ci-dessous.
-    dropdown.querySelector('.yoo-mentions-close')!.addEventListener('mousedown', (e) => e.preventDefault());
+    dropdown.querySelector('.mzre-mentions-close')!.addEventListener('mousedown', (e) => e.preventDefault());
     dropdown.addEventListener('click', (e: Event) => {
-      if ((e.target as Element).closest('.yoo-mentions-close')) {
+      if ((e.target as Element).closest('.mzre-mentions-close')) {
         Editor._closeMentionDropdown(state);
         return;
       }
 
-      const option = (e.target as Element).closest<HTMLElement>('.yoo-mention-item');
+      const option = (e.target as Element).closest<HTMLElement>('.mzre-mention-item');
       if (option) Editor._insertMention(option, content, state, integration);
     });
 
@@ -886,7 +886,7 @@ export default class Editor {
     state: MentionState
   ): void {
     const listId = state.listId;
-    const results = dropdown.querySelector<HTMLElement>('.yoo-mentions-results');
+    const results = dropdown.querySelector<HTMLElement>('.mzre-mentions-results');
     const status = dropdown.querySelector<HTMLElement>('[role="status"]');
     // Bulle fermée ou remplacée pendant la recherche : ces résultats ne la concernent plus.
     if (!listId || !results || !status || state.dropdown !== dropdown) return;
@@ -904,12 +904,12 @@ export default class Editor {
 
     if (!items.length) {
       results.innerHTML = `
-        <div class="yoo-mentions-empty">
-          <svg class="yoo-mentions-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+        <div class="mzre-mentions-empty">
+          <svg class="mzre-mentions-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span class="yoo-mentions-empty-text">${te('noUserFound')}</span>
+          <span class="mzre-mentions-empty-text">${te('noUserFound')}</span>
         </div>`;
       state.content.removeAttribute('aria-controls');
       status.textContent = t('noUserFound');
@@ -917,7 +917,7 @@ export default class Editor {
       return;
     }
 
-    results.innerHTML = `<div class="yoo-mentions-list" role="listbox" id="${listId}" aria-label="${te('mentionSuggestions')}">${items.join('')}</div>`;
+    results.innerHTML = `<div class="mzre-mentions-list" role="listbox" id="${listId}" aria-label="${te('mentionSuggestions')}">${items.join('')}</div>`;
     state.content.setAttribute('aria-controls', listId);
     status.textContent = (items.length === 1 ? t('mentionResultsOne') : t('mentionResultsMany'))
       .replace('{count}', String(items.length));
@@ -926,7 +926,7 @@ export default class Editor {
 
   /** Options affichées dans la bulle (vide tant qu'elle n'a pas de résultats). */
   private static _mentionOptions (state: MentionState): HTMLElement[] {
-    return Array.from(state.dropdown?.querySelectorAll<HTMLElement>('.yoo-mention-item') ?? []);
+    return Array.from(state.dropdown?.querySelectorAll<HTMLElement>('.mzre-mention-item') ?? []);
   }
 
   /** Choisit une option au clavier : `aria-selected` sur l'option, `aria-activedescendant` sur la zone de saisie. */
@@ -1009,13 +1009,13 @@ export default class Editor {
     // Avatar décoratif : le nom est lu juste à côté.
     const avatarHtml = avatar
       ? `<img src="${escapeHtml(avatar)}" alt="" loading="lazy" />`
-      : `<span class="yoo-mention-avatar-fallback" aria-hidden="true">${escapeHtml(initials.toUpperCase())}</span>`;
+      : `<span class="mzre-mention-avatar-fallback" aria-hidden="true">${escapeHtml(initials.toUpperCase())}</span>`;
 
     return `
-          <div class="yoo-mention-item" id="${escapeHtml(id)}" data-user-id="${escapeHtml(user.ID)}" data-profile-url="${escapeHtml(profilePath)}" role="option" aria-selected="false">
-            <div class="yoo-mention-avatar">${avatarHtml}</div>
-            <div class="yoo-mention-info">
-              <span class="yoo-mention-name">${escapeHtml(name)}</span>
+          <div class="mzre-mention-item" id="${escapeHtml(id)}" data-user-id="${escapeHtml(user.ID)}" data-profile-url="${escapeHtml(profilePath)}" role="option" aria-selected="false">
+            <div class="mzre-mention-avatar">${avatarHtml}</div>
+            <div class="mzre-mention-info">
+              <span class="mzre-mention-name">${escapeHtml(name)}</span>
             </div>
           </div>`;
   }
@@ -1028,7 +1028,7 @@ export default class Editor {
   ): void {
     if (!state.atNode) return;
 
-    const username = item.querySelector('.yoo-mention-name')?.textContent?.trim() ?? '';
+    const username = item.querySelector('.mzre-mention-name')?.textContent?.trim() ?? '';
     const profileUrl = item.dataset.profileUrl ?? '';
     const userId = integration.encodeUserId(item.dataset.userId ?? '');
 
@@ -1084,7 +1084,7 @@ export default class Editor {
    * @param options.minHeight Hauteur minimale de la zone de saisie (ex: '160px')
    * @param options.maxHeight Hauteur maximale avant scroll (ex: '400px')
    *
-   * Les attributs data-yoo-* sur chaque textarea sont prioritaires sur les options JS.
+   * Les attributs data-mzre-* sur chaque textarea sont prioritaires sur les options JS.
    * Voir le bloc de documentation en tête de fichier pour les cas d'usage détaillés.
    *
    * @returns Editor (chaînable)

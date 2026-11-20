@@ -30,9 +30,9 @@ describe('injection des styles', () => {
     await EmojiPicker.open({onSelect: vi.fn()});
     await EmojiPicker.open({onSelect: vi.fn()});
 
-    expect(styleTags().map((tag) => tag.id).sort()).toEqual(['yoo-editor-styles', 'yoo-emoji-picker-styles']);
-    expect(document.getElementById('yoo-editor-styles')!.textContent).toBe(EDITOR_CSS);
-    expect(document.getElementById('yoo-emoji-picker-styles')!.textContent).toBe(EMOJI_PICKER_CSS);
+    expect(styleTags().map((tag) => tag.id).sort()).toEqual(['mzre-editor-styles', 'mzre-emoji-picker-styles']);
+    expect(document.getElementById('mzre-editor-styles')!.textContent).toBe(EDITOR_CSS);
+    expect(document.getElementById('mzre-emoji-picker-styles')!.textContent).toBe(EMOJI_PICKER_CSS);
   });
 
   it('n’ajoute aucune balise style quand l’injection est coupée (option de montage)', async () => {
@@ -41,8 +41,8 @@ describe('injection des styles', () => {
 
     expect(styleTags()).toHaveLength(0);
     // L'éditeur et le sélecteur fonctionnent quand même, en attendant que la page charge style.css.
-    expect(document.querySelector('.yoo-content')).not.toBeNull();
-    expect(document.querySelectorAll('.yoo-emoji-picker__item').length).toBeGreaterThan(0);
+    expect(document.querySelector('.mzre-content')).not.toBeNull();
+    expect(document.querySelectorAll('.mzre-emoji-picker__item').length).toBeGreaterThan(0);
   });
 
   it('pose le nonce de la CSP sur les balises injectées', async () => {
@@ -59,7 +59,7 @@ describe('injection des styles', () => {
     setEditorStyles({nonce: undefined});
     Editor.mount(textarea(), {});
 
-    expect(document.getElementById('yoo-editor-styles')!.hasAttribute('nonce')).toBe(false);
+    expect(document.getElementById('mzre-editor-styles')!.hasAttribute('nonce')).toBe(false);
   });
 });
 
@@ -71,10 +71,10 @@ describe('barre d’outils sans attribut style', () => {
   it('met en forme les boutons U et S par classe, pas par attribut style=""', () => {
     Editor.mount(textarea(), {});
 
-    expect(document.querySelectorAll('.yoo-toolbar [style]')).toHaveLength(0);
-    expect(document.querySelector('[data-cmd="underline"]')!.classList.contains('yoo-btn-underline')).toBe(true);
-    expect(document.querySelector('[data-cmd="strikeThrough"]')!.classList.contains('yoo-btn-strike')).toBe(true);
-    expect(EDITOR_CSS).toContain('.yoo-toolbar button.yoo-btn-underline');
-    expect(EDITOR_CSS).toContain('.yoo-toolbar button.yoo-btn-strike');
+    expect(document.querySelectorAll('.mzre-toolbar [style]')).toHaveLength(0);
+    expect(document.querySelector('[data-cmd="underline"]')!.classList.contains('mzre-btn-underline')).toBe(true);
+    expect(document.querySelector('[data-cmd="strikeThrough"]')!.classList.contains('mzre-btn-strike')).toBe(true);
+    expect(EDITOR_CSS).toContain('.mzre-toolbar button.mzre-btn-underline');
+    expect(EDITOR_CSS).toContain('.mzre-toolbar button.mzre-btn-strike');
   });
 });

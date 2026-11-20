@@ -14,7 +14,7 @@ try {
 // 2) La feuille de style existe, contient les deux composants et ne dépend de rien d'extérieur.
 try {
   const css = readFileSync(new URL('../dist/style.css', import.meta.url), 'utf8');
-  for (const selector of ['.yoo-editor-wrap', '.yoo-mentions-dropdown', '.yoo-emoji-picker']) {
+  for (const selector of ['.mzre-editor-wrap', '.mzre-mentions-dropdown', '.mzre-emoji-picker']) {
     if (!css.includes(selector)) failures.push(`dist/style.css ne contient pas ${selector}`);
   }
   if (css.includes('@import')) failures.push('dist/style.css contient un @import');

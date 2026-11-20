@@ -13,7 +13,7 @@ describe('EmojiPicker', () => {
     await EmojiPicker.open({onSelect: vi.fn()});
     await EmojiPicker.open({onSelect: vi.fn()});
 
-    expect(document.querySelectorAll('.yoo-emoji-picker')).toHaveLength(1);
+    expect(document.querySelectorAll('.mzre-emoji-picker')).toHaveLength(1);
     expect(document.querySelector('[role="dialog"]')?.getAttribute('aria-modal')).toBe('true');
     expect(document.querySelector('.modal, [data-bs-toggle]')).toBeNull();
   });
@@ -21,12 +21,12 @@ describe('EmojiPicker', () => {
   it('selects an emoji and closes the modal', async () => {
     const onSelect = vi.fn();
     await EmojiPicker.open({onSelect});
-    const emojiButton = document.querySelector<HTMLButtonElement>('.yoo-emoji-picker__item')!;
+    const emojiButton = document.querySelector<HTMLButtonElement>('.mzre-emoji-picker__item')!;
 
     emojiButton.click();
 
     expect(onSelect).toHaveBeenCalledWith(emojiButton.textContent);
-    expect(document.querySelector<HTMLElement>('.yoo-emoji-picker')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('.mzre-emoji-picker')?.hidden).toBe(true);
   });
 
   it('changes category through its tabs', async () => {
@@ -37,7 +37,7 @@ describe('EmojiPicker', () => {
 
     expect(tabs[0].getAttribute('aria-selected')).toBe('false');
     expect(tabs[1].getAttribute('aria-selected')).toBe('true');
-    expect(document.querySelector('.yoo-emoji-picker__panel')?.getAttribute('aria-labelledby')).toBe(tabs[1].id);
+    expect(document.querySelector('.mzre-emoji-picker__panel')?.getAttribute('aria-labelledby')).toBe(tabs[1].id);
   });
 
   it('closes with Escape and restores focus', async () => {
@@ -48,13 +48,13 @@ describe('EmojiPicker', () => {
 
     document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
 
-    expect(document.querySelector<HTMLElement>('.yoo-emoji-picker')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>('.mzre-emoji-picker')?.hidden).toBe(true);
     expect(document.activeElement).toBe(opener);
   });
 
   it('closes when its backdrop is clicked', async () => {
     await EmojiPicker.open({onSelect: vi.fn()});
-    const backdrop = document.querySelector<HTMLElement>('.yoo-emoji-picker')!;
+    const backdrop = document.querySelector<HTMLElement>('.mzre-emoji-picker')!;
 
     backdrop.click();
 
