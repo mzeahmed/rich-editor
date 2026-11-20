@@ -3,10 +3,10 @@ import {readdirSync, readFileSync} from 'node:fs';
 import {describe, expect, it} from 'vitest';
 
 /**
- * Le paquet doit rester utilisable sous une CSP stricte (sans 'unsafe-inline') : seules les balises
- * <style> posées par `styles.ts` (désactivables, avec nonce) sont tolérées ; ni attribut style="",
- * ni gestionnaire d'événement en ligne, ni eval. Les styles posés par l'API CSSOM
- * (`element.style.left = …`) ne sont pas concernés par la CSP.
+ * The package must stay usable under a strict CSP (without 'unsafe-inline'): only the
+ * <style> tags added by `styles.ts` (can be disabled, with a nonce) are tolerated; no style="" attribute,
+ * no inline event handler, no eval. Styles set through the CSSOM API
+ * (`element.style.left = …`) are not covered by the CSP.
  */
 const SOURCES = readdirSync(new URL('../src/', import.meta.url))
   .filter((file) => file.endsWith('.ts'))
@@ -15,18 +15,18 @@ const SOURCES = readdirSync(new URL('../src/', import.meta.url))
 const offenders = (pattern: RegExp, except: string[] = []): string[] =>
   SOURCES.filter(({file, code}) => !except.includes(file) && pattern.test(code)).map(({file}) => file);
 
-describe('compatibilité avec une CSP stricte', () => {
-  it('ne génère aucun attribut style="" dans le HTML', () => {
+describe('strict CSP compatibility', () => {
+  it('generates no style="" attribute in the HTML', () => {
     expect(offenders(/\sstyle=["'`$]/)).toEqual([]);
     expect(offenders(/setAttribute\(\s*['"]style['"]/)).toEqual([]);
   });
 
-  it('ne crée de balise <style> que dans styles.ts', () => {
+  it('creates a <style> tag only in styles.ts', () => {
     expect(offenders(/createElement\(\s*['"]style['"]\s*\)/, ['styles.ts'])).toEqual([]);
     expect(offenders(/<style[\s>]/, ['styles.ts'])).toEqual([]);
   });
 
-  it('n’utilise ni gestionnaire d’événement en ligne ni eval', () => {
+  it('uses neither an inline event handler nor eval', () => {
     expect(offenders(/\son[a-z]+=["'`$]/)).toEqual([]);
     expect(offenders(/\beval\(|new Function\(/)).toEqual([]);
   });

@@ -13,7 +13,7 @@ const bubble = (): HTMLElement | null => document.querySelector<HTMLElement>('.m
 const options = (): HTMLElement[] => Array.from(document.querySelectorAll<HTMLElement>('.mzre-mention-item'));
 const status = (): string => document.querySelector('.mzre-mentions-dropdown [role="status"]')?.textContent ?? '';
 
-/** Touche pressée dans la zone de saisie ; renvoie l'événement pour lire `defaultPrevented`. */
+/** Key pressed in the writing area; returns the event so `defaultPrevented` can be read. */
 function press(content: HTMLElement, key: string, init: KeyboardEventInit = {}): KeyboardEvent {
   const event = new KeyboardEvent('keydown', {key, bubbles: true, cancelable: true, ...init});
   content.dispatchEvent(event);
@@ -21,10 +21,10 @@ function press(content: HTMLElement, key: string, init: KeyboardEventInit = {}):
   return event;
 }
 
-describe('bulle des mentions : accessibilité', () => {
+describe('mention bubble: accessibility', () => {
   beforeEach(() => {
     setEditorLocale('en');
-    // jsdom n'a pas execCommand, que l'insertion d'une mention appelle pour ajouter l'espace final.
+    // jsdom has no execCommand, which inserting a mention calls to add the trailing space.
     Object.assign(document, {execCommand: vi.fn()});
   });
 
@@ -33,7 +33,7 @@ describe('bulle des mentions : accessibilité', () => {
     vi.restoreAllMocks();
   });
 
-  it('donne un rôle et un nom à la zone de saisie', () => {
+  it('gives the writing area a role and a name', () => {
     const content = mountEditor();
 
     expect(attr(content, 'role')).toBe('textbox');
@@ -41,7 +41,7 @@ describe('bulle des mentions : accessibilité', () => {
     expect(attr(content, 'aria-label')).toBe('Write here…');
   });
 
-  it('nomme la bulle (repère) et le sélecteur de style de la barre d’outils', async () => {
+  it('names the bubble (landmark) and the toolbar’s style selector', async () => {
     const content = mountEditor(USERS);
     await openMentionBubble(content);
 
@@ -50,14 +50,14 @@ describe('bulle des mentions : accessibilité', () => {
     expect(attr(document.querySelector('.mzre-block-select'), 'aria-label')).toBe('Text style');
   });
 
-  it('expose une liste d’options liée à la zone de saisie', async () => {
+  it('exposes an options list linked to the writing area', async () => {
     const content = mountEditor(TWO_USERS);
     await openMentionBubble(content);
 
     const listbox = document.querySelector('[role="listbox"]')!;
     expect(attr(listbox, 'aria-label')).toBe('Mention suggestions');
     expect(attr(content, 'aria-autocomplete')).toBe('list');
-    // Rôle textbox : ces deux attributs ne lui sont pas permis.
+    // textbox role: these two attributes are not allowed on it.
     expect(content.hasAttribute('aria-expanded')).toBe(false);
     expect(content.hasAttribute('aria-haspopup')).toBe(false);
     expect(attr(content, 'aria-controls')).toBe(listbox.id);
@@ -73,7 +73,7 @@ describe('bulle des mentions : accessibilité', () => {
     expect(new Set(options().map((option) => option.id)).size).toBe(2);
   });
 
-  it('reste cachée tant qu’il n’y a aucun résultat à montrer', async () => {
+  it('stays hidden while there is no result to show', async () => {
     const content = mountEditor();
     type(content, '@');
 
@@ -84,7 +84,7 @@ describe('bulle des mentions : accessibilité', () => {
     await vi.waitFor(() => expect(bubble()?.hidden).toBe(false));
   });
 
-  it('annonce le nombre de suggestions, ou l’absence de résultat, dans une zone qui existe avant', async () => {
+  it('announces the number of suggestions, or the absence of results, in a region that exists beforehand', async () => {
     const content = mountEditor(TWO_USERS);
     type(content, '@');
     const region = document.querySelector('.mzre-mentions-dropdown [role="status"]');
@@ -100,7 +100,7 @@ describe('bulle des mentions : accessibilité', () => {
     expect(status()).toBe('No user found');
   });
 
-  it('annonce « 1 suggestion » au singulier et dans la langue choisie', async () => {
+  it('announces "1 suggestion" in the singular and in the chosen language', async () => {
     const content = mountEditor(USERS);
     await openMentionBubble(content);
     expect(status()).toContain('1 suggestion available');
@@ -113,7 +113,7 @@ describe('bulle des mentions : accessibilité', () => {
     expect(attr(document.querySelector('[role="listbox"]'), 'aria-label')).toBe('Suggestions de mention');
   });
 
-  it('choisit une suggestion avec les flèches, en boucle, et le dit à la zone de saisie', async () => {
+  it('chooses a suggestion with the arrow keys, wrapping around, and tells the writing area', async () => {
     const content = mountEditor(TWO_USERS);
     await openMentionBubble(content);
 
@@ -133,11 +133,11 @@ describe('bulle des mentions : accessibilité', () => {
     expect(options().filter((option) => attr(option, 'aria-selected') === 'true')).toHaveLength(1);
   });
 
-  it('part de la dernière suggestion avec Flèche haut, et Début/Fin ne servent qu’une fois un choix fait', async () => {
+  it('starts from the last suggestion with Arrow Up, and Home/End only work once a choice is made', async () => {
     const content = mountEditor(TWO_USERS);
     await openMentionBubble(content);
 
-    // Sans choix : Début et Fin déplacent le curseur comme d'habitude.
+    // With no choice: Home and End move the caret as usual.
     expect(press(content, 'Home').defaultPrevented).toBe(false);
     expect(press(content, 'End').defaultPrevented).toBe(false);
 
@@ -149,7 +149,7 @@ describe('bulle des mentions : accessibilité', () => {
     expect(attr(options()[1], 'aria-selected')).toBe('true');
   });
 
-  it('insère la suggestion choisie avec Entrée, et referme la bulle', async () => {
+  it('inserts the chosen suggestion with Enter, and closes the bubble', async () => {
     const content = mountEditor(TWO_USERS);
     await openMentionBubble(content);
     press(content, 'ArrowDown');
@@ -166,7 +166,7 @@ describe('bulle des mentions : accessibilité', () => {
     );
   });
 
-  it('insère aussi avec Tab quand une suggestion est choisie', async () => {
+  it('also inserts with Tab when a suggestion is chosen', async () => {
     const content = mountEditor(TWO_USERS);
     await openMentionBubble(content);
     press(content, 'ArrowDown');
@@ -177,18 +177,18 @@ describe('bulle des mentions : accessibilité', () => {
     expect(content.querySelector('a.mention')?.getAttribute('data-user-id')).toBe('7');
   });
 
-  it('laisse Entrée et Tab à leur rôle habituel quand aucune suggestion n’est choisie', async () => {
+  it('leaves Enter and Tab to their usual role when no suggestion is chosen', async () => {
     const content = mountEditor(TWO_USERS);
     await openMentionBubble(content);
 
     expect(press(content, 'Enter').defaultPrevented).toBe(false);
-    // Tab garde le comportement de l'éditeur (insérer des espaces), il n'insère pas de mention.
+    // Tab keeps the editor's behavior (inserting spaces), it does not insert a mention.
     press(content, 'Tab');
     expect(document.execCommand).toHaveBeenCalledWith('insertHTML', false, expect.stringContaining('&nbsp;'));
     expect(content.querySelector('a.mention')).toBeNull();
   });
 
-  it('ferme tout de suite avec Échap, sans toucher au texte ni fermer une modale autour', async () => {
+  it('closes at once with Escape, without touching the text or closing a surrounding modal', async () => {
     const content = mountEditor(TWO_USERS);
     await openMentionBubble(content);
     const reachedPage = vi.fn();
@@ -204,7 +204,7 @@ describe('bulle des mentions : accessibilité', () => {
     expect(content.hasAttribute('aria-autocomplete')).toBe(false);
   });
 
-  it('retire les attributs ARIA quand on ferme par la croix', async () => {
+  it('removes the ARIA attributes when closed with the cross', async () => {
     const content = mountEditor(TWO_USERS);
     await openMentionBubble(content);
     press(content, 'ArrowDown');
@@ -216,7 +216,7 @@ describe('bulle des mentions : accessibilité', () => {
     expect(content.hasAttribute('aria-controls')).toBe(false);
   });
 
-  it('n’intercepte aucune touche sans bulle ouverte, ni pendant une composition de texte', async () => {
+  it('intercepts no key without an open bubble, nor during text composition', async () => {
     const closed = mountEditor(TWO_USERS);
     expect(press(closed, 'ArrowDown').defaultPrevented).toBe(false);
     expect(press(closed, 'Escape').defaultPrevented).toBe(false);
@@ -227,7 +227,7 @@ describe('bulle des mentions : accessibilité', () => {
     expect(options().some((option) => attr(option, 'aria-selected') === 'true')).toBe(false);
   });
 
-  it('garde la liste sans décor : l’avatar est décoratif, le nom est lu à côté', async () => {
+  it('keeps the list free of decoration: the avatar is decorative, the name is read next to it', async () => {
     const content = mountEditor(USERS);
     await openMentionBubble(content);
 

@@ -11,7 +11,7 @@ const textarea = (): HTMLTextAreaElement => {
 };
 const styleTags = (): HTMLStyleElement[] => Array.from(document.querySelectorAll<HTMLStyleElement>('style'));
 
-describe('injection des styles', () => {
+describe('style injection', () => {
   beforeEach(() => {
     EmojiPicker.destroy();
     styleTags().forEach((tag) => tag.remove());
@@ -25,7 +25,7 @@ describe('injection des styles', () => {
     setEditorStyles({inject: true, nonce: undefined});
   });
 
-  it('injecte les styles de l’éditeur et du sélecteur par défaut, une seule fois chacun', async () => {
+  it('injects the editor and picker styles by default, once each', async () => {
     Editor.mount(textarea(), {});
     await EmojiPicker.open({onSelect: vi.fn()});
     await EmojiPicker.open({onSelect: vi.fn()});
@@ -35,17 +35,17 @@ describe('injection des styles', () => {
     expect(document.getElementById('mzre-emoji-picker-styles')!.textContent).toBe(EMOJI_PICKER_CSS);
   });
 
-  it('n’ajoute aucune balise style quand l’injection est coupée (option de montage)', async () => {
+  it('adds no style tag when injection is off (mount option)', async () => {
     Editor.mount(textarea(), {styles: {inject: false}});
     await EmojiPicker.open({onSelect: vi.fn()});
 
     expect(styleTags()).toHaveLength(0);
-    // L'éditeur et le sélecteur fonctionnent quand même, en attendant que la page charge style.css.
+    // The editor and the picker still work, until the page loads style.css.
     expect(document.querySelector('.mzre-content')).not.toBeNull();
     expect(document.querySelectorAll('.mzre-emoji-picker__item').length).toBeGreaterThan(0);
   });
 
-  it('pose le nonce de la CSP sur les balises injectées', async () => {
+  it('sets the CSP nonce on the injected tags', async () => {
     setEditorStyles({nonce: 'abc123'});
     Editor.mount(textarea(), {});
     await EmojiPicker.open({onSelect: vi.fn()});
@@ -54,7 +54,7 @@ describe('injection des styles', () => {
     styleTags().forEach((tag) => expect(tag.getAttribute('nonce')).toBe('abc123'));
   });
 
-  it('retire le nonce quand on lui donne une valeur vide', () => {
+  it('removes the nonce when given an empty value', () => {
     setEditorStyles({nonce: 'abc123'});
     setEditorStyles({nonce: undefined});
     Editor.mount(textarea(), {});
@@ -63,12 +63,12 @@ describe('injection des styles', () => {
   });
 });
 
-describe('barre d’outils sans attribut style', () => {
+describe('toolbar without a style attribute', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
 
-  it('met en forme les boutons U et S par classe, pas par attribut style=""', () => {
+  it('styles the U and S buttons through a class, not a style="" attribute', () => {
     Editor.mount(textarea(), {});
 
     expect(document.querySelectorAll('.mzre-toolbar [style]')).toHaveLength(0);

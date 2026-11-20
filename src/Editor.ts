@@ -1,72 +1,72 @@
 /**
- * Éditeur riche autonome — 0 dépendance externe.
- * Remplace automatiquement les <textarea> par un éditeur contenteditable enrichi.
+ * Standalone rich text editor.
+ * Automatically replaces <textarea> elements with an enhanced contenteditable editor.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * UTILISATION DE BASE
+ * BASIC USAGE
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * 1) Tous les <textarea> de la page
+ * 1) Every <textarea> on the page
  *    Editor.init();
  *
- * 2) Sélecteur CSS ciblé
+ * 2) Targeted CSS selector
  *    Editor.init({ selector: '.richtext' });
  *
- * 3) Exclure certains textarea
+ * 3) Exclude some textareas
  *    Editor.init({ exclude: '.no-editor' });
  *
- * 4) Monter sur un élément précis (DOM dynamique)
+ * 4) Mount on a specific element (dynamic DOM)
  *    Editor.mount('#my-textarea');
  *    Editor.mount(textareaElement);
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * OPTIONS TOOLBAR
+ * TOOLBAR OPTIONS
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * toolbar: 'always'  → barre toujours visible (défaut)
+ * toolbar: 'always'  → toolbar always visible (default)
  *    Editor.init({ toolbar: 'always' });
  *
- * toolbar: 'focus'   → barre affichée uniquement quand le champ est focusé
+ * toolbar: 'focus'   → toolbar shown only while the field is focused
  *    Editor.init({ toolbar: 'focus' });
  *
- * toolbar: 'toggle'  → bouton "Mise en forme" pour afficher/masquer la barre
+ * toolbar: 'toggle'  → a "Formatting" button shows/hides the toolbar
  *    Editor.init({ toolbar: 'toggle' });
  *
- * toolbar: 'never'   → aucune barre (champ de saisie simple enrichi)
+ * toolbar: 'never'   → no toolbar (plain rich input field)
  *    Editor.init({ toolbar: 'never' });
  *
- * Surcharge par textarea individuel via attribut data :
+ * Per-textarea override through a data attribute:
  *    <textarea data-mzre-toolbar="focus"></textarea>
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * FOOTER (compteur de caractères + boutons HTML / Effacer / Copier)
+ * FOOTER (character counter + HTML / Clear / Copy buttons)
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * Masquer le footer (utile pour les champs embarqués, ex. messagerie) :
+ * Hide the footer (useful for embedded fields, e.g. messaging):
  *    Editor.mount('#msg-textarea', { footer: false });
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * HAUTEUR DE LA ZONE DE SAISIE
+ * HEIGHT OF THE WRITING AREA
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * Via les options JS :
+ * Through the JS options:
  *    Editor.mount('#my-textarea', { minHeight: '80px', maxHeight: '300px' });
  *
- * Via attributs data sur le <textarea> (prioritaires sur les options JS) :
+ * Through data attributes on the <textarea> (they take precedence over the JS options):
  *    <textarea data-mzre-min-height="60px" data-mzre-max-height="200px"></textarea>
  *
- * Quand maxHeight est défini, overflow-y: auto est activé automatiquement.
+ * When maxHeight is set, overflow-y: auto is enabled automatically.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * EMOJI
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * Ajoute un bouton 😊 inline à la zone de saisie. Le sélecteur est fourni par le paquet
- * (aucune modale à préparer) ; ses données sont chargées à la première ouverture.
+ * Adds an inline 😊 button to the writing area. The picker is provided by the package
+ * (no modal to prepare); its data is loaded on first open.
  *
  *    Editor.mount('#editor', { emoji: true });
  *
- * Combiné sans toolbar (type champ de post/commentaire) :
+ * Combined with no toolbar (post/comment field style):
  *    Editor.mount('#post-textarea', {
  *      toolbar: 'never',
  *      footer: false,
@@ -77,16 +77,16 @@
  * MENTIONS
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * Active la saisie assistée des mentions @utilisateur (nécessite integrations.mentions) :
- *   · Frappe @ → bulle de recherche d'utilisateurs (integrations.mentions.searchUsers)
- *   · Sélection → insère <a class="mention" href="/profil" data-user-id="…">Prénom Nom</a>
- *   · Fermeture sur Espace / Échap / Entrée, par la croix, ou par un clic à l'extérieur
+ * Enables assisted @user mentions (requires integrations.mentions):
+ *   · Typing @ → user search bubble (integrations.mentions.searchUsers)
+ *   · Selection → inserts <a class="mention" href="/profile" data-user-id="…">First Last</a>
+ *   · Closes on Space / Escape / Enter, with the cross, or by clicking outside
  *
- * Activation simple :
+ * Simple activation:
  *    Editor.mount('#editor', { mention: true }, { mentions: … });
  *
- * Combinaison complète (type formulaire de publication), avec un bouton « publier » désactivé
- * tant que le champ est vide (onChange est aussi appelé une fois au montage) :
+ * Full combination (publishing form style), with a "publish" button disabled
+ * while the field is empty (onChange is also called once at mount):
  *    Editor.mount('#post-textarea', {
  *      toolbar: 'never',
  *      footer: false,
@@ -95,7 +95,7 @@
  *      onChange: ({ isEmpty }) => { publishButton.disabled = isEmpty; },
  *    }, { mentions: … });
  *
- * Combinaison commentaire :
+ * Comment combination:
  *    Editor.mount('#comment-textarea', {
  *      toolbar: 'never',
  *      footer: false,
@@ -104,24 +104,24 @@
  *    });
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * LANGUE
+ * LANGUAGE
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * Interface et emojis en anglais par défaut ; { locale: 'fr' } (ou setEditorLocale('fr')) pour le
- * français. Un texte peut être remplacé : integrations.messages = { close: 'Fermer' }.
+ * Interface and emojis in English by default; { locale: 'fr' } (or setEditorLocale('fr')) for
+ * French. A text can be overridden: integrations.messages = { close: 'Dismiss' }.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * CAS D'USAGE COMPLETS
+ * COMPLETE USE CASES
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * A) Éditeur de contenu riche (article, description longue)
+ * A) Rich content editor (article, long description)
  *    Editor.init({
  *      selector: 'textarea.rich-content',
  *      toolbar: 'always',
  *      minHeight: '300px',
  *    });
  *
- * B) Éditeur compact pour commentaires (toolbar au focus)
+ * B) Compact comment editor (toolbar on focus)
  *    Editor.init({
  *      selector: 'textarea.comment',
  *      toolbar: 'focus',
@@ -130,7 +130,7 @@
  *      footer: false,
  *    });
  *
- * C) Champ de saisie messagerie (sans toolbar, sans footer, hauteur fixe)
+ * C) Messaging input field (no toolbar, no footer, fixed height)
  *    Editor.mount('#messaging-textarea', {
  *      toolbar: 'never',
  *      footer: false,
@@ -138,27 +138,27 @@
  *      maxHeight: '120px',
  *    });
  *
- * D) Éditeur avec barre optionnelle via bouton toggle
+ * D) Editor with an optional toolbar behind a toggle button
  *    Editor.mount('#post-content', { toolbar: 'toggle' });
  *
- * E) Montage sur un élément ajouté dynamiquement (ex. modale ouverte)
- *    modal.addEventListener('shown', () => { // événement d'ouverture de votre modale
+ * E) Mounting on a dynamically added element (e.g. an opened modal)
+ *    modal.addEventListener('shown', () => { // your modal's open event
  *      Editor.mount('#modal-textarea', { toolbar: 'focus', minHeight: '120px' });
  *    });
  *
- * F) Surcharge par textarea individuel (attributs data, sans JS supplémentaire)
+ * F) Per-textarea override (data attributes, no extra JS)
  *    <textarea
  *      data-mzre-toolbar="toggle"
  *      data-mzre-min-height="100px"
  *      data-mzre-max-height="400px"
  *    ></textarea>
- *    puis : Editor.init();   ← les attributs data prennent le dessus
+ *    then: Editor.init();   ← the data attributes take precedence
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * CHAÎNAGE
+ * CHAINING
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * init() et mount() retournent la classe, le chaînage est possible :
+ * init() and mount() return the class, so calls can be chained:
  *    Editor
  *      .init({ selector: '.rich', toolbar: 'always' })
  *      .mount('#extra-field', { toolbar: 'never', footer: false });
@@ -172,10 +172,10 @@ import {message as t, setEditorLocale, setEditorMessages} from './messages.js';
 import type {EditorLocale, EditorMessages} from './messages.js';
 import type {EditorIntegrations, EditorMentionIntegration, EditorUser,} from './types.js';
 
-/** Texte de l'interface, échappé pour être inséré dans du HTML. */
+/** Interface text, escaped so it can be inserted into HTML. */
 const te = (key: keyof EditorMessages): string => escapeHtml(t(key));
 
-/** État du contenu, transmis à `onChange` à chaque modification et une fois au montage. */
+/** Content state, passed to `onChange` on every change and once at mount. */
 export interface EditorChange {
   html: string;
   text: string;
@@ -185,28 +185,28 @@ export interface EditorChange {
 export interface EditorOptions {
   selector?: string;
   exclude?: string;
-  /** 'always' | 'toggle' | 'focus' | 'never' — défaut : 'always' */
+  /** 'always' | 'toggle' | 'focus' | 'never' — default: 'always' */
   toolbar?: 'always' | 'toggle' | 'focus' | 'never';
-  /** Afficher ou masquer le footer (compteur + boutons) — défaut : true */
+  /** Show or hide the footer (counter + buttons) — default: true */
   footer?: boolean;
-  /** Hauteur minimale de la zone de saisie (ex: '80px', '4rem') — défaut : '160px' */
+  /** Minimum height of the writing area (e.g. '80px', '4rem') — default: '160px' */
   minHeight?: string;
-  /** Hauteur maximale de la zone de saisie avant scroll (ex: '400px') */
+  /** Maximum height of the writing area before it scrolls (e.g. '400px') */
   maxHeight?: string;
-  /** Ajoute un bouton emoji inline à la zone de saisie */
+  /** Adds an inline emoji button to the writing area */
   emoji?: boolean;
-  /** Active les mentions @ (nécessite `integrations.mentions`) */
+  /** Enables @mentions (requires `integrations.mentions`) */
   mention?: boolean;
-  /** Langue de l'interface et des emojis : 'en' (défaut) ou 'fr'. Réglage global de la page. */
+  /** Language of the interface and of the emojis: 'en' (default) or 'fr'. Page-wide setting. */
   locale?: EditorLocale;
   /**
-   * Injection des styles (réglage global de la page) : `{inject: false}` pour charger vous-même
-   * `@mzeahmed/rich-editor/style.css`, `{nonce}` pour une CSP à nonce. Voir `setEditorStyles()`.
+   * Style injection (page-wide setting): `{inject: false}` to load
+   * `@mzeahmed/rich-editor/style.css` yourself, `{nonce}` for a nonce-based CSP. See `setEditorStyles()`.
    */
   styles?: StyleOptions;
   /**
-   * Appelé à chaque modification du contenu (saisie, barre d'outils, mention) et une fois au
-   * montage : de quoi activer ou désactiver un bouton « publier » selon que le champ est vide.
+   * Called on every content change (typing, toolbar, mention) and once at
+   * mount: handy to enable or disable a "publish" button depending on whether the field is empty.
    */
   onChange?: (change: EditorChange) => void;
 }
@@ -217,26 +217,26 @@ interface MentionState {
   atOffset: number;
   previousTerm: string | null;
   dropdown: HTMLElement | null;
-  /** Zone de saisie : porte les attributs ARIA tant que la bulle est ouverte. */
+  /** Writing area: carries the ARIA attributes while the bubble is open. */
   content: HTMLElement;
-  /** Option choisie au clavier (-1 : aucune, Entrée garde alors son rôle habituel). */
+  /** Option chosen with the keyboard (-1: none, Enter then keeps its usual role). */
   activeIndex: number;
-  /** Identifiant de la liste d'options, cible de `aria-controls`. */
+  /** Id of the options list, target of `aria-controls`. */
   listId: string | null;
-  /** Retire l'écouteur « clic à l'extérieur » posé à l'ouverture de la bulle. */
+  /** Removes the "click outside" listener set when the bubble opened. */
   stopOutsideClose: (() => void) | null;
 }
 
 let mentionBubbleCount = 0;
 
 /**
- * Attributs ARIA que la zone de saisie (rôle `textbox`) porte tant que la bulle des mentions est
- * ouverte. Seuls ceux que ce rôle accepte : `aria-expanded` et `aria-haspopup` ne le sont pas.
+ * ARIA attributes carried by the writing area (`textbox` role) while the mention bubble is
+ * open. Only those this role accepts: `aria-expanded` and `aria-haspopup` are not allowed.
  */
 const MENTION_ARIA = ['aria-autocomplete', 'aria-controls', 'aria-activedescendant'];
 
 /* ─────────────────────────────────────────
-   CSS injecté une seule fois dans <head>
+   CSS injected only once into <head>
 ───────────────────────────────────────── */
 
 
@@ -258,14 +258,14 @@ const ICONS: Record<string, string> = {
 export default class Editor {
 
   /* ─────────────────────────────────────────
-     Inject CSS une seule fois
+     Inject CSS only once
   ───────────────────────────────────────── */
   private static injectStyles (): void {
     injectStyleSheet('mzre-editor-styles', EDITOR_CSS);
   }
 
   /* ─────────────────────────────────────────
-     Fabrique le HTML d'un éditeur
+     Builds the HTML of an editor
   ───────────────────────────────────────── */
   private static buildEditorHTML (placeholder: string, toolbarMode: string, label: string): string {
     const toggleBar = toolbarMode === 'toggle'
@@ -277,10 +277,10 @@ export default class Editor {
          </div>`
       : '';
 
-    // Pour le mode 'never', toolbar et link bar ne sont pas rendus dans le DOM
-    // `type="button"` sur chaque bouton : sans lui, un <button> dans un
-    // <form> vaut implicitement type="submit" et soumet le formulaire hôte
-    // au clic (ex. FeedComposer.tsx) au lieu d'exécuter sa commande d'édition.
+    // In 'never' mode, the toolbar and the link bar are not rendered in the DOM
+    // `type="button"` on every button: without it, a <button> inside a
+    // <form> implicitly has type="submit" and submits the host form
+    // on click instead of running its editing command.
     const toolbarAndLinkBar = toolbarMode !== 'never' ? `
       <div class="mzre-toolbar">
         <select class="mzre-block-select" aria-label="${te('textStyle')}">
@@ -343,7 +343,7 @@ export default class Editor {
   }
 
   /* ─────────────────────────────────────────
-     Monte l'éditeur sur un <textarea>
+     Mounts the editor on a <textarea>
   ───────────────────────────────────────── */
   private static mountEditor (textarea: HTMLTextAreaElement, opts: EditorOptions = {}, integrations: EditorIntegrations = {}): void {
     if (textarea.dataset.mzreMounted) return;
@@ -362,7 +362,7 @@ export default class Editor {
 
     const wrap = document.createElement('div');
     wrap.className = 'mzre-editor-wrap';
-    // Nom accessible de la zone de saisie : l'aria-label du textarea, sinon son placeholder.
+    // Accessible name of the writing area: the textarea's aria-label, else its placeholder.
     wrap.innerHTML = Editor.buildEditorHTML(placeholder, toolbarMode!, textarea.getAttribute('aria-label') ?? '');
 
     textarea.parentNode!.insertBefore(wrap, textarea);
@@ -380,14 +380,14 @@ export default class Editor {
     const btnCopy = wrap.querySelector<HTMLButtonElement>('.mzre-btn-copy')!;
     const toggleBtn = wrap.querySelector<HTMLButtonElement>('.mzre-toggle-btn');
 
-    // Masquer le footer si demandé
+    // Hide the footer if requested
     if (!showFooter) {
       const footer = wrap.querySelector<HTMLElement>('.mzre-footer');
       if (footer) footer.style.display = 'none';
       exportBox.style.display = 'none';
     }
 
-    // Appliquer les hauteurs personnalisées
+    // Apply the custom heights
     if (minHeight) content.style.minHeight = minHeight;
     if (maxHeight) {
       content.style.maxHeight = maxHeight;
@@ -396,7 +396,7 @@ export default class Editor {
 
     let savedRange: Range | null = null;
 
-    /* ── Visibilité toolbar ── */
+    /* ── Toolbar visibility ── */
     const showToolbar = (): void => {
       if (!toolbar) return;
 
@@ -417,12 +417,12 @@ export default class Editor {
       toggleBtn?.classList.remove('mzre-active');
     };
 
-    // toolbarMode 'never' : toolbar absent du DOM, rien à faire
+    // toolbarMode 'never': no toolbar in the DOM, nothing to do
     if (toolbarMode === 'focus') {
       hideToolbar();
       content.addEventListener('focus', showToolbar);
       content.addEventListener('blur', () => {
-        // Petit délai pour laisser le clic toolbar se déclencher avant de masquer
+        // Short delay so the toolbar click can fire before hiding
         setTimeout(() => { if (!wrap.contains(document.activeElement)) hideToolbar(); }, 150);
       });
     } else if (toolbarMode === 'toggle') {
@@ -434,10 +434,10 @@ export default class Editor {
       showToolbar();
     }
 
-    // Contenu initial nettoyé : une valeur stockée et rechargée ne doit jamais exécuter de script.
+    // Initial content sanitized: a stored and reloaded value must never run a script.
     if (initialValue) content.innerHTML = sanitizeHtml(initialValue);
 
-    /* ── Sync vers le textarea caché ── */
+    /* ── Sync to the hidden textarea ── */
     const emitChange = (): void => {
       const text = content.innerText ?? '';
       opts.onChange?.({html: content.innerHTML, text, isEmpty: text.trim() === ''});
@@ -447,13 +447,13 @@ export default class Editor {
       emitChange();
     };
 
-    /* ── Compteur de caractères ── */
+    /* ── Character counter ── */
     const refreshCount = (): void => {
       const n = content.innerText.replace(/\n/g, '').length;
       charCount.textContent = n + (n <= 1 ? ` ${t('character')}` : ` ${t('characters')}`);
     };
 
-    /* ── Exécuter une commande ── */
+    /* ── Run a command ── */
     const exec = (cmd: string, val: string | null = null): void => {
       content.focus();
       if (savedRange) {
@@ -468,14 +468,14 @@ export default class Editor {
       sync();
     };
 
-    /* ── Style de bloc ── */
+    /* ── Block style ── */
     const setBlock = (tag: string): void => {
       content.focus();
       document.execCommand('formatBlock', false, tag);
       sync();
     };
 
-    /* ── État des boutons toolbar ── */
+    /* ── Toolbar button state ── */
     const refreshToolbar = (): void => {
       if (!toolbar || !blockSelect) return;
 
@@ -492,7 +492,7 @@ export default class Editor {
       blockSelect.value = ['p', 'h2', 'h3', 'blockquote'].includes(block) ? block : 'p';
     };
 
-    /* ── Barre de lien ── */
+    /* ── Link bar ── */
     const openLinkBar = (): void => {
       if (!linkBar || !linkInput) return;
       const sel = window.getSelection();
@@ -526,7 +526,7 @@ export default class Editor {
       }
     };
 
-    /* ── Effacer ── */
+    /* ── Clear ── */
     const clearContent = (): void => {
       if (content.innerText.trim() && !confirm(t('clearConfirm'))) return;
       content.innerHTML = '';
@@ -535,7 +535,7 @@ export default class Editor {
       if (exportBox.style.display !== 'none') exportBox.textContent = '';
     };
 
-    /* ── Copier ── */
+    /* ── Copy ── */
     const copyHTML = (): void => {
       navigator.clipboard.writeText(content.innerHTML).then(() => {
         const orig = btnCopy.textContent!;
@@ -544,7 +544,7 @@ export default class Editor {
       });
     };
 
-    /* ── Événements toolbar (absent en mode 'never') ── */
+    /* ── Toolbar events (absent in 'never' mode) ── */
     if (toolbar) {
       toolbar.addEventListener('click', (e: MouseEvent) => {
         const btn = (e.target as Element).closest<HTMLButtonElement>('button[data-cmd]');
@@ -561,7 +561,7 @@ export default class Editor {
       blockSelect!.addEventListener('change', () => setBlock(blockSelect!.value));
     }
 
-    /* ── Événements barre de lien (absent en mode 'never') ── */
+    /* ── Link bar events (absent in 'never' mode) ── */
     if (linkBar && linkInput) {
       wrap.querySelector('.mzre-btn-insert')!.addEventListener('click', insertLink);
       wrap.querySelector('.mzre-btn-remove')!.addEventListener('click', () => {
@@ -572,12 +572,12 @@ export default class Editor {
       linkInput.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') insertLink(); });
     }
 
-    /* ── Événements footer ── */
+    /* ── Footer events ── */
     btnHtml.addEventListener('click', toggleHTML);
     btnClear.addEventListener('click', clearContent);
     btnCopy.addEventListener('click', copyHTML);
 
-    /* ── Événements zone de saisie ── */
+    /* ── Writing area events ── */
     content.addEventListener('input', () => {
       sync();
       refreshCount();
@@ -672,7 +672,7 @@ export default class Editor {
       selection?.removeAllRanges();
       selection?.addRange(range);
 
-      // Déclenche la synchronisation du contenteditable vers le textarea source.
+      // Triggers the sync from the contenteditable to the source textarea.
       content.dispatchEvent(new Event('input', {bubbles: true}));
       content.focus();
       },
@@ -699,7 +699,7 @@ export default class Editor {
       stopOutsideClose: null,
     };
 
-    // En capture : avant le gestionnaire de l'éditeur (la touche Tab insère sinon des espaces).
+    // In capture phase: before the editor's handler (otherwise Tab inserts spaces).
     content.addEventListener('keydown', (e: KeyboardEvent) => {
       Editor._handleMentionKeydown(e, content, state, integration);
     }, true);
@@ -728,7 +728,7 @@ export default class Editor {
     const lastChar = textBeforeCursor[textBeforeCursor.length - 1];
 
     if (lastChar === '@') {
-      // Un nouveau « @ » alors qu'une bulle est ouverte : l'ancienne ne doit pas rester à l'écran.
+      // A new "@" while a bubble is open: the old one must not stay on screen.
       Editor._closeMentionDropdown(state);
       state.isSearch = true;
       state.atNode = textNode;
@@ -764,13 +764,13 @@ export default class Editor {
   }
 
   /**
-   * Crée la bulle sur document.body en position fixed — contourne overflow:hidden de
-   * .mzre-editor-wrap, identique au pattern du picker emoji. Positionnée au bas de la zone de saisie,
-   * décalée vers le haut si besoin.
+   * Creates the bubble on document.body with fixed positioning — works around the overflow:hidden of
+   * .mzre-editor-wrap, same pattern as the emoji picker. Placed below the writing area,
+   * shifted upward if needed.
    *
-   * Sa structure est posée une fois : en-tête avec la croix, zone d'annonce pour les lecteurs
-   * d'écran (présente avant ses changements, sinon rien n'est lu) et zone des résultats. Elle reste
-   * cachée tant qu'il n'y a rien à montrer.
+   * Its structure is built once: a header with the cross, an announcement area for screen
+   * readers (present before it changes, otherwise nothing is read) and a results area. It stays
+   * hidden while there is nothing to show.
    */
   private static _showMentionDropdown (
     content: HTMLElement,
@@ -779,7 +779,7 @@ export default class Editor {
   ): HTMLElement {
     const dropdown = document.createElement('div');
     dropdown.className = 'mzre-mentions-dropdown';
-    // Repère nommé : le contenu de la bulle, ajoutée à la fin de la page, n'est sinon dans aucun repère.
+    // Named landmark: the bubble's content, appended at the end of the page, would otherwise be in no landmark.
     dropdown.setAttribute('role', 'region');
     dropdown.setAttribute('aria-label', t('mentionSuggestions'));
     dropdown.hidden = true;
@@ -791,8 +791,8 @@ export default class Editor {
       <div class="mzre-sr-only" role="status" aria-live="polite"></div>
       <div class="mzre-mentions-results"></div>`;
 
-    // Garde le focus dans la zone de saisie quand on appuie sur la croix : la fermeture se fait sur
-    // le clic, traité ci-dessous.
+    // Keeps focus in the writing area when the cross is pressed: closing happens on
+    // the click, handled below.
     dropdown.querySelector('.mzre-mentions-close')!.addEventListener('mousedown', (e) => e.preventDefault());
     dropdown.addEventListener('click', (e: Event) => {
       if ((e.target as Element).closest('.mzre-mentions-close')) {
@@ -812,26 +812,26 @@ export default class Editor {
   private static _positionDropdown (dropdown: HTMLElement, content: HTMLElement): void {
     const rect = content.getBoundingClientRect();
     const width = Math.min(Math.round(rect.width), 420);
-    const dropH = 300; // hauteur estimée max du dropdown
+    const dropH = 300; // estimated max height of the dropdown
 
     dropdown.style.left = `${Math.round(rect.left)}px`;
     dropdown.style.width = `${width}px`;
 
     const spaceBelow = window.innerHeight - rect.bottom;
     if (spaceBelow >= dropH || spaceBelow >= 150) {
-      // Sous la zone de saisie
+      // Below the writing area
       dropdown.style.top = `${Math.round(rect.bottom + 4)}px`;
       dropdown.style.bottom = 'auto';
     } else {
-      // Au-dessus si pas assez de place en bas
+      // Above if there is not enough room below
       dropdown.style.bottom = `${Math.round(window.innerHeight - rect.top + 4)}px`;
       dropdown.style.top = 'auto';
     }
   }
 
   /**
-   * Ferme la bulle dès qu'on appuie (souris ou doigt) ailleurs que sur elle, y compris dans le texte
-   * de l'éditeur. L'écouteur est posé à l'ouverture et retiré par _closeMentionDropdown().
+   * Closes the bubble as soon as the user presses (mouse or finger) anywhere but on it, including in the text
+   * of the editor. The listener is added on open and removed by _closeMentionDropdown().
    */
   private static _closeOnOutsidePointer (state: MentionState): void {
     const onPointerDown = (event: Event): void => {
@@ -888,11 +888,11 @@ export default class Editor {
     const listId = state.listId;
     const results = dropdown.querySelector<HTMLElement>('.mzre-mentions-results');
     const status = dropdown.querySelector<HTMLElement>('[role="status"]');
-    // Bulle fermée ou remplacée pendant la recherche : ces résultats ne la concernent plus.
+    // Bubble closed or replaced during the search: these results no longer concern it.
     if (!listId || !results || !status || state.dropdown !== dropdown) return;
 
-    // Les textes et adresses viennent de l'application hôte : échappés ici, jamais insérés bruts.
-    // Un membre sans adresse de profil exploitable n'est pas proposé.
+    // Texts and URLs come from the host application: escaped here, never inserted raw.
+    // A member without a usable profile URL is not offered.
     const items = users
       .filter((user): user is EditorUser => user !== null)
       .map((user, index) => Editor._mentionItemHtml(user, `${listId}-option-${index}`))
@@ -924,12 +924,12 @@ export default class Editor {
     dropdown.hidden = false;
   }
 
-  /** Options affichées dans la bulle (vide tant qu'elle n'a pas de résultats). */
+  /** Options shown in the bubble (empty until it has results). */
   private static _mentionOptions (state: MentionState): HTMLElement[] {
     return Array.from(state.dropdown?.querySelectorAll<HTMLElement>('.mzre-mention-item') ?? []);
   }
 
-  /** Choisit une option au clavier : `aria-selected` sur l'option, `aria-activedescendant` sur la zone de saisie. */
+  /** Chooses an option with the keyboard: `aria-selected` on the option, `aria-activedescendant` on the writing area. */
   private static _setActiveMention (state: MentionState, index: number): void {
     const options = Editor._mentionOptions(state);
 
@@ -946,11 +946,11 @@ export default class Editor {
   }
 
   /**
-   * Clavier, tant que la bulle est ouverte. Le focus ne quitte jamais la zone de saisie :
-   *   · Échap          → ferme la bulle sans toucher au texte (et sans fermer une modale hôte)
-   *   · Flèches haut/bas, Début/Fin → choisissent une suggestion (avec Début/Fin seulement une fois
-   *     une suggestion choisie ; sinon ils déplacent le curseur comme d'habitude)
-   *   · Entrée ou Tab  → insèrent la suggestion choisie ; sans choix, ils gardent leur rôle habituel
+   * Keyboard, while the bubble is open. Focus never leaves the writing area:
+   *   · Escape         → closes the bubble without touching the text (and without closing a host modal)
+   *   · Up/Down arrows, Home/End → choose a suggestion (Home/End only once
+   *     a suggestion is chosen; otherwise they move the caret as usual)
+   *   · Enter or Tab  → insert the chosen suggestion; with no choice, they keep their usual role
    */
   private static _handleMentionKeydown (
     e: KeyboardEvent,
@@ -995,7 +995,7 @@ export default class Editor {
     }
   }
 
-  /** Ligne d'un membre dans la bulle ; chaîne vide si son adresse de profil est inexploitable. */
+  /** A member's row in the bubble; empty string if their profile URL is unusable. */
   private static _mentionItemHtml (user: EditorUser, id: string): string {
     const profilePath = safeSitePath(user.profileUrl);
     if (profilePath === null) return '';
@@ -1006,7 +1006,7 @@ export default class Editor {
     const avatar = safeHttpUrl(user.avatarUrl);
     const initials = ([...firstName][0] ?? '') + ([...lastName][0] ?? '');
 
-    // Avatar décoratif : le nom est lu juste à côté.
+    // Decorative avatar: the name is read right next to it.
     const avatarHtml = avatar
       ? `<img src="${escapeHtml(avatar)}" alt="" loading="lazy" />`
       : `<span class="mzre-mention-avatar-fallback" aria-hidden="true">${escapeHtml(initials.toUpperCase())}</span>`;
@@ -1032,14 +1032,14 @@ export default class Editor {
     const profileUrl = item.dataset.profileUrl ?? '';
     const userId = integration.encodeUserId(item.dataset.userId ?? '');
 
-    // Calculer la fin du @terme depuis l'état sauvegardé — ne pas utiliser
-    // la sélection courante : le focus a quitté le contenteditable lors du clic
-    // sur le dropdown, rendant l'offset invalide pour state.atNode.
+    // Compute the end of the @term from the saved state — do not use
+    // the current selection: focus left the contenteditable on the click
+    // on the dropdown, making the offset invalid for state.atNode.
     const nodeLen = state.atNode.textContent?.length ?? 0;
-    const termLen = 1 + (state.previousTerm?.length ?? 0); // 1 = le @ lui-même
+    const termLen = 1 + (state.previousTerm?.length ?? 0); // 1 = the @ itself
     const endOffset = Math.min(state.atOffset + termLen, nodeLen);
 
-    // Supprimer le texte "@terme" puis insérer le blot mention
+    // Remove the "@term" text then insert the mention blot
     const deleteRange = document.createRange();
     deleteRange.setStart(state.atNode, state.atOffset);
     deleteRange.setEnd(state.atNode, endOffset);
@@ -1053,8 +1053,8 @@ export default class Editor {
     mentionEl.textContent = username;
     deleteRange.insertNode(mentionEl);
 
-    // Remettre le focus sur le contenteditable (perdu lors du clic sur le dropdown)
-    // puis déplacer le curseur après la mention et insérer un espace séparateur.
+    // Put focus back on the contenteditable (lost on the dropdown click)
+    // then move the caret after the mention and insert a separator space.
     content.focus();
     const sel = window.getSelection()!;
     const newRange = document.createRange();
@@ -1066,28 +1066,28 @@ export default class Editor {
 
     Editor._closeMentionDropdown(state);
 
-    // Déclenche le listener 'input' existant qui appelle sync() + refreshCount()
+    // Triggers the existing 'input' listener that calls sync() + refreshCount()
     content.dispatchEvent(new Event('input'));
   }
 
   /* ─────────────────────────────────────────
-     API publique
+     Public API
   ───────────────────────────────────────── */
 
   /**
-   * Initialise l'éditeur sur tous les textarea correspondant au sélecteur.
+   * Initializes the editor on every textarea matching the selector.
    *
-   * @param options.selector  Sélecteur CSS cible (défaut : 'textarea')
-   * @param options.exclude   Sélecteur CSS à exclure
-   * @param options.toolbar   Mode toolbar : 'always' | 'toggle' | 'focus' | 'never'
-   * @param options.footer    Afficher le footer — défaut : true
-   * @param options.minHeight Hauteur minimale de la zone de saisie (ex: '160px')
-   * @param options.maxHeight Hauteur maximale avant scroll (ex: '400px')
+   * @param options.selector  CSS selector to target (default: 'textarea')
+   * @param options.exclude   CSS selector to exclude
+   * @param options.toolbar   Toolbar mode: 'always' | 'toggle' | 'focus' | 'never'
+   * @param options.footer    Show the footer — default: true
+   * @param options.minHeight Minimum height of the writing area (e.g. '160px')
+   * @param options.maxHeight Maximum height before it scrolls (e.g. '400px')
    *
-   * Les attributs data-mzre-* sur chaque textarea sont prioritaires sur les options JS.
-   * Voir le bloc de documentation en tête de fichier pour les cas d'usage détaillés.
+   * The data-mzre-* attributes on each textarea take precedence over the JS options.
+   * See the documentation block at the top of the file for detailed use cases.
    *
-   * @returns Editor (chaînable)
+   * @returns Editor (chainable)
    */
   static init (options: EditorOptions = {}, integrations: EditorIntegrations = {}): typeof Editor {
     if (options.styles) setEditorStyles(options.styles);
@@ -1105,14 +1105,14 @@ export default class Editor {
   }
 
   /**
-   * Monte l'éditeur sur un textarea précis.
-   * Idéal pour les éléments ajoutés dynamiquement au DOM (modales, widgets ajax…).
+   * Mounts the editor on a specific textarea.
+   * Ideal for elements added dynamically to the DOM (modals, ajax widgets…).
    *
-   * @param target   Élément HTMLTextAreaElement ou sélecteur CSS
-   * @param options  Mêmes options que init()
+   * @param target   HTMLTextAreaElement element or CSS selector
+   * @param options  Same options as init()
    *
    * @param integrations
-   * @returns Editor (chaînable)
+   * @returns Editor (chainable)
    */
   static mount (
     target: HTMLTextAreaElement | string,

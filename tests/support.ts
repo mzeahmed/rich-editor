@@ -2,7 +2,7 @@ import {expect, vi} from 'vitest';
 import Editor from '../src/Editor.js';
 import type {EditorUser} from '../src/types.js';
 
-// jsdom n'implémente pas innerText, que l'éditeur lit : équivalent texte brut pour les tests.
+// jsdom does not implement innerText, which the editor reads: plain-text equivalent for the tests.
 Object.defineProperty(HTMLElement.prototype, 'innerText', {
   configurable: true,
   get(this: HTMLElement) {
@@ -13,7 +13,7 @@ Object.defineProperty(HTMLElement.prototype, 'innerText', {
   }
 });
 
-// Autres API d'édition absentes de jsdom, lues par la barre d'outils à chaque touche relâchée.
+// Other editing APIs missing from jsdom, read by the toolbar on every key release.
 Object.assign(document, {queryCommandState: () => false, queryCommandValue: () => ''});
 
 export const USERS: EditorUser[] = [
@@ -26,7 +26,7 @@ export const USERS: EditorUser[] = [
   }
 ];
 
-/** Monte l'éditeur avec les mentions ; la recherche renvoie `users` sans attendre. */
+/** Mounts the editor with mentions; the search returns `users` without waiting. */
 export function mountEditor(users: EditorUser[] = USERS, initialValue = ''): HTMLElement {
   document.body.innerHTML = '<textarea id="post"></textarea>';
   document.querySelector<HTMLTextAreaElement>('#post')!.value = initialValue;
@@ -43,7 +43,7 @@ export function mountEditor(users: EditorUser[] = USERS, initialValue = ''): HTM
   return document.querySelector<HTMLElement>('.mzre-content')!;
 }
 
-/** Saisie dans le même nœud texte (un nœud remplacé fermerait la bulle) et touche relâchée. */
+/** Typing in the same text node (a replaced node would close the bubble) and key release. */
 export function type(content: HTMLElement, text: string): void {
   const node = (content.firstChild as Text | null) ?? content.appendChild(document.createTextNode(''));
   node.data = text;
@@ -58,7 +58,7 @@ export function type(content: HTMLElement, text: string): void {
   content.dispatchEvent(new KeyboardEvent('keyup', {code: 'KeyA'}));
 }
 
-/** Tape « @le » : la bulle s'ouvre puis affiche les résultats de la recherche. */
+/** Types "@le": the bubble opens then shows the search results. */
 export async function openMentionBubble(content: HTMLElement): Promise<void> {
   type(content, '@');
   type(content, '@le');

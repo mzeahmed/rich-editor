@@ -3,13 +3,13 @@ import {mountEditor, openMentionBubble, type} from './support.js';
 
 const bubbles = (): number => document.querySelectorAll('.mzre-mentions-dropdown').length;
 
-describe('bulle des mentions', () => {
+describe('mention bubble', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     vi.restoreAllMocks();
   });
 
-  it('se ferme avec la croix, sans insérer de mention', async () => {
+  it('closes with the cross, without inserting a mention', async () => {
     const content = mountEditor();
     await openMentionBubble(content);
     expect(bubbles()).toBe(1);
@@ -20,7 +20,7 @@ describe('bulle des mentions', () => {
     expect(content.querySelector('a.mention')).toBeNull();
   });
 
-  it('a une croix accessible, aussi quand aucun membre ne correspond', async () => {
+  it('has an accessible cross, also when no member matches', async () => {
     const content = mountEditor([]);
     await openMentionBubble(content);
 
@@ -28,7 +28,7 @@ describe('bulle des mentions', () => {
     expect(document.querySelector('.mzre-mentions-close')?.getAttribute('aria-label')).toBe('Close');
   });
 
-  it('se ferme quand on appuie en dehors, y compris dans le texte de l’éditeur', async () => {
+  it('closes when pressing outside, including in the editor’s text', async () => {
     const content = mountEditor();
     await openMentionBubble(content);
 
@@ -40,7 +40,7 @@ describe('bulle des mentions', () => {
     expect(bubbles()).toBe(0);
   });
 
-  it('reste ouverte quand on appuie dans la bulle', async () => {
+  it('stays open when pressing inside the bubble', async () => {
     const content = mountEditor();
     await openMentionBubble(content);
 
@@ -50,7 +50,7 @@ describe('bulle des mentions', () => {
     expect(bubbles()).toBe(1);
   });
 
-  it('ne laisse qu’une seule bulle quand on retape « @ »', async () => {
+  it('leaves a single bubble when "@" is typed again', async () => {
     const content = mountEditor();
     await openMentionBubble(content);
 
@@ -59,7 +59,7 @@ describe('bulle des mentions', () => {
     expect(bubbles()).toBe(1);
   });
 
-  it('retire son écouteur de la page à la fermeture', async () => {
+  it('removes its listener from the page on close', async () => {
     const add = vi.spyOn(document, 'addEventListener');
     const remove = vi.spyOn(document, 'removeEventListener');
     const content = mountEditor();

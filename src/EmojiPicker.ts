@@ -25,8 +25,8 @@ const ROOT_CLASS = 'mzre-emoji-picker';
 const STYLE_ID = 'mzre-emoji-picker-styles';
 
 /**
- * Chargeurs des données d'emojis, un par langue. Les imports sont écrits en toutes lettres : les
- * bundlers en font un fichier séparé par langue, chargé à la demande.
+ * Emoji data loaders, one per language. The imports are written out literally:
+ * bundlers turn each into a separate file per language, loaded on demand.
  */
 const LOADERS: Record<EditorLocale, () => Promise<[{default: unknown}, {default: {groups: unknown}}]>> = {
   en: () => Promise.all([import('emojibase-data/en/data.json'), import('emojibase-data/en/messages.json')]),
@@ -36,10 +36,10 @@ const LOADERS: Record<EditorLocale, () => Promise<[{default: unknown}, {default:
 const emojiData = new Map<EditorLocale, Promise<EmojiData>>();
 
 /**
- * Charge les données d'emojis de la langue à la première ouverture seulement (une fois par langue).
- * Un import statique alourdirait le paquet de tous ses utilisateurs (~1 Mo) et ferait échouer son
- * import côté serveur : Node refuse un import JSON sans attribut. En cas d'échec, la prochaine
- * ouverture réessaie.
+ * Loads a language's emoji data on first open only (once per language).
+ * A static import would weigh down the package for all its users (~1 MB) and break its
+ * server-side import: Node rejects a JSON import without an attribute. On failure, the next
+ * open retries.
  */
 function loadEmojiData(locale: EditorLocale): Promise<EmojiData> {
   let loading = emojiData.get(locale);
@@ -78,9 +78,9 @@ export default class EmojiPicker {
   private static pending: Promise<void> | null = null;
 
   /**
-   * Ouvre le sélecteur : la fenêtre s'affiche aussitôt, les emojis arrivent dès que leurs données
-   * sont chargées. La promesse est résolue une fois les emojis affichés (ou, en cas d'échec de
-   * chargement, une fois le message d'erreur affiché) : elle n'est jamais rejetée.
+   * Opens the picker: the window appears at once, the emojis arrive as soon as their data
+   * is loaded. The promise resolves once the emojis are displayed (or, if loading fails, once the
+   * error message is displayed): it is never rejected.
    */
   static open(options: EmojiPickerOptions): Promise<void> {
     this.ensureMounted();
@@ -100,7 +100,7 @@ export default class EmojiPicker {
     this.root!.hidden = false;
     document.addEventListener('keydown', this.handleDocumentKeydown);
 
-    // Données déjà chargées : on retombe sur l'onglet actif ; sinon sur la zone, en attendant.
+    // Data already loaded: fall back to the active tab; otherwise to the panel, while waiting.
     if (this.hasCurrentData()) this.focusSelectedTab();
     else this.panel?.focus();
 
@@ -131,19 +131,19 @@ export default class EmojiPicker {
     this.pending = null;
   }
 
-  /** Les données affichées sont celles de la langue courante (elle peut changer entre deux ouvertures). */
+  /** The displayed data is that of the current language (it may change between two openings). */
   private static hasCurrentData(): boolean {
     return this.data !== null && this.dataLocale === getEditorLocale();
   }
 
-  /** Une seule mise en place à la fois : une réouverture pendant le chargement attend la même. */
+  /** Only one setup at a time: reopening during loading waits for the same one. */
   private static showEmojis(): Promise<void> {
     if (this.hasCurrentData()) return Promise.resolve();
 
     if (this.pending) return this.pending;
 
     const pending: Promise<void> = this.renderEmojis().finally(() => {
-      // Seulement si c'est toujours elle : un destroy() puis un nouvel open() peut l'avoir remplacée.
+      // Only if it is still the current one: a destroy() then a new open() may have replaced it.
       if (this.pending === pending) this.pending = null;
     });
     this.pending = pending;
@@ -155,7 +155,7 @@ export default class EmojiPicker {
     this.tabs.find(tab => tab.getAttribute('aria-selected') === 'true')?.focus();
   }
 
-  /** Affiche les catégories et les emojis, ou l'erreur de chargement ; ne rejette jamais. */
+  /** Displays the categories and the emojis, or the loading error; never rejects. */
   private static async renderEmojis(): Promise<void> {
     const root = this.root;
     const locale = getEditorLocale();
@@ -165,7 +165,7 @@ export default class EmojiPicker {
 
     try {
       const data = await loadEmojiData(locale);
-      // Détruit ou remonté entre-temps : ces données ne concernent plus cette fenêtre.
+      // Destroyed or remounted in the meantime: this data no longer concerns this window.
       if (this.root !== root || !root) return;
 
       this.data = data;
@@ -176,7 +176,7 @@ export default class EmojiPicker {
       this.activateGroup(0);
       if (!root.hidden) this.focusSelectedTab();
     } catch (error) {
-      console.error('[EmojiPicker] chargement des emojis impossible', error);
+      console.error('[EmojiPicker] could not load the emojis', error);
       if (this.root === root) this.setPanelMessage(message('emojiLoadError'));
     } finally {
       if (this.root === root) this.panel?.removeAttribute('aria-busy');

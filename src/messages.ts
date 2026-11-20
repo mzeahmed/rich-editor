@@ -1,10 +1,10 @@
 /**
- * Textes de l'interface de l'éditeur. Anglais par défaut ; le français est fourni. Chaque texte
- * peut être remplacé (`integrations.messages`) et une autre langue se règle avec `setEditorLocale()`
- * ou l'option `locale`.
+ * Interface texts of the editor. English by default; French is provided. Each text
+ * can be overridden (`integrations.messages`) and another language is set with `setEditorLocale()`
+ * or the `locale` option.
  *
- * La langue est un réglage global de la page : le dernier `init()`/`mount()`/`setEditorLocale()`
- * l'emporte, pour tous les éditeurs et le sélecteur d'emojis.
+ * The language is a page-wide setting: the last `init()`/`mount()`/`setEditorLocale()`
+ * wins, for all editors and for the emoji picker.
  */
 
 export type EditorLocale = 'en' | 'fr';
@@ -45,7 +45,7 @@ export interface EditorMessages {
   close: string;
   noUserFound: string;
   mentionSuggestions: string;
-  /** `{count}` est remplacé par le nombre de suggestions. */
+  /** `{count}` is replaced by the number of suggestions. */
   mentionResultsOne: string;
   mentionResultsMany: string;
   emojiCategories: string;
@@ -144,12 +144,12 @@ const CATALOGS: Record<EditorLocale, EditorMessages> = {en: messagesEn, fr: mess
 let currentLocale: EditorLocale = 'en';
 let overrides: Partial<EditorMessages> = {};
 
-/** Langue de l'interface et des données d'emojis (`en` par défaut). Une valeur inconnue est ignorée. */
+/** Language of the interface and of the emoji data (`en` by default). An unknown value is ignored. */
 export function setEditorLocale (locale: EditorLocale): void {
   if (locale in CATALOGS) currentLocale = locale;
 }
 
-/** Remplace certains textes, quelle que soit la langue ; `undefined` ou `{}` retire les remplacements. */
+/** Overrides some texts, whatever the language; `undefined` or `{}` removes the overrides. */
 export function setEditorMessages (messages: Partial<EditorMessages> | undefined): void {
   overrides = {...messages};
 }
@@ -158,7 +158,7 @@ export function getEditorLocale (): EditorLocale {
   return currentLocale;
 }
 
-/** Texte brut (à échapper avant de l'insérer dans du HTML). */
+/** Plain text (to be escaped before inserting it into HTML). */
 export function message (key: keyof EditorMessages): string {
   return overrides[key] ?? CATALOGS[currentLocale][key];
 }

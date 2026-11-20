@@ -30,7 +30,7 @@ export interface EditorMentionIntegration {
 }
 
 export interface EditorIntegrations {
-  /** Remplace certains textes de l'interface (voir EditorMessages) ; la langue se règle par `locale`. */
+  /** Overrides some interface texts (see EditorMessages); the language is set through `locale`. */
   messages?: Partial<EditorMessages>;
   mentions?: EditorMentionIntegration;
 }

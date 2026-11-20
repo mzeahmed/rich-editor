@@ -1,7 +1,7 @@
 /**
- * Feuilles de style du paquet. Source unique : elles sont injectées dans la page à l'exécution
- * (voir `injectStyleSheet`) et écrites dans `dist/style.css` à la construction (`scripts/build-css.mjs`),
- * pour les applications dont la CSP interdit les balises `<style>` injectées.
+ * Stylesheets of the package. Single source: they are injected into the page at runtime
+ * (see `injectStyleSheet`) and written to `dist/style.css` at build time (`scripts/build-css.mjs`),
+ * for applications whose CSP forbids injected `<style>` tags.
  */
 
 export const EDITOR_CSS = `
@@ -173,7 +173,7 @@ export const EDITOR_CSS = `
 .mzre-toolbar-toggle button:hover { background: #e8e5df; color: #333; }
 .mzre-toolbar-toggle button.mzre-active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
 
-/* toolbar masquée par défaut (mode on-focus ou on-demand) */
+/* toolbar hidden by default (on-focus or on-demand mode) */
 .mzre-editor-wrap.mzre-toolbar-hidden .mzre-toolbar,
 .mzre-editor-wrap.mzre-toolbar-hidden .mzre-link-bar {
   display: none !important;
@@ -182,7 +182,7 @@ export const EDITOR_CSS = `
   display: flex;
 }
 
-/* animation d'apparition */
+/* appearance animation */
 .mzre-toolbar {
   transition: max-height .18s ease, opacity .18s ease;
   overflow: hidden;
@@ -199,7 +199,7 @@ export const EDITOR_CSS = `
   opacity: 1;
 }
 
-/* ── Bouton emoji positionné dans la zone de saisie ── */
+/* ── Emoji button positioned inside the writing area ── */
 .mzre-content-wrap {
   position: relative;
 }
@@ -220,7 +220,7 @@ export const EDITOR_CSS = `
 }
 .mzre-content-wrap .mzre-emoji-button:hover { background: #e8e5df; color: #666; }
 
-/* ── Dropdown mentions (positionné en fixed via JS sur document.body) ── */
+/* ── Mentions dropdown (positioned fixed via JS on document.body) ── */
 @keyframes mzreMentionIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -361,7 +361,7 @@ export const EDITOR_CSS = `
 }
 .mzre-mentions-dropdown .mzre-mentions-empty-text { font-size: 14px; }
 
-/* ── Tag mention inline dans le contenu ── */
+/* ── Inline mention tag in the content ── */
 .mzre-content a.mention {
   display: inline-flex;
   align-items: center;
@@ -380,7 +380,7 @@ export const EDITOR_CSS = `
   transform: translateY(-1px);
 }
 
-/* Boutons U et S de la barre d'outils : mis en forme par classe (un attribut de style en ligne serait bloqué par une CSP stricte) */
+/* U and S buttons of the toolbar: styled through a class (an inline style attribute would be blocked by a strict CSP) */
 .mzre-toolbar button.mzre-btn-underline { text-decoration: underline; }
 .mzre-toolbar button.mzre-btn-strike { text-decoration: line-through; }
 `;
@@ -495,11 +495,11 @@ export const EMOJI_PICKER_CSS = `
 `;
 
 /**
- * Réglage de l'injection des styles, global à la page (comme la langue).
+ * Style injection setting, global to the page (like the language).
  *
- * - `inject: false` : le paquet n'ajoute aucune balise `<style>` ; chargez alors
- *   `@mzeahmed/rich-editor/style.css` vous-même (nécessaire sous une CSP sans `'unsafe-inline'`).
- * - `nonce` : nonce de votre CSP, posé sur les balises `<style>` injectées (`style-src 'nonce-…'`).
+ * - `inject: false`: the package adds no `<style>` tag; then load
+ *   `@mzeahmed/rich-editor/style.css` yourself (required under a CSP without `'unsafe-inline'`).
+ * - `nonce`: your CSP nonce, set on the injected `<style>` tags (`style-src 'nonce-…'`).
  */
 export interface StyleOptions {
   inject?: boolean;
@@ -514,7 +514,7 @@ export function setEditorStyles (options: StyleOptions): void {
   if ('nonce' in options) styleNonce = options.nonce || undefined;
 }
 
-/** Ajoute la feuille `css` dans `<head>` sous l'identifiant `id` (une seule fois), sauf si l'injection est coupée. */
+/** Adds the `css` stylesheet to `<head>` under the id `id` (only once), unless injection is off. */
 export function injectStyleSheet (id: string, css: string): void {
   if (!injectStyles || document.getElementById(id)) return;
 

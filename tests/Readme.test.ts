@@ -5,11 +5,11 @@ import ts from 'typescript';
 import {describe, expect, it} from 'vitest';
 
 /**
- * Les exemples TypeScript du README doivent compiler contre les vrais types du paquet : une
- * documentation dont le code ne compile plus est pire que pas de documentation.
+ * The README's TypeScript examples must compile against the package's real types: documentation
+ * whose code no longer compiles is worse than no documentation.
  *
- * Chaque bloc ```ts est compilé séparément (en strict), avec quelques variables de page déclarées
- * (`textarea`, `publishButton`). Les blocs ```bash ne sont pas concernés.
+ * Each ```ts block is compiled separately (in strict mode), with a few page variables declared
+ * (`textarea`, `publishButton`). ```bash blocks are not concerned.
  */
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const README = readFileSync(`${ROOT}README.md`, 'utf8');
@@ -56,7 +56,7 @@ function diagnose(code: string): string[] {
 }
 
 describe('README', () => {
-  it('contient des exemples TypeScript', () => {
+  it('contains TypeScript examples', () => {
     expect(BLOCKS.length).toBeGreaterThanOrEqual(7);
   });
 
@@ -64,19 +64,19 @@ describe('README', () => {
     expect(diagnose(code)).toEqual([]);
   });
 
-  it('refuse un exemple faux : le contrôle détecte bien une erreur de type', () => {
+  it('rejects a wrong example: the check does detect a type error', () => {
     expect(diagnose("import Editor from '@mzeahmed/rich-editor';\nEditor.mount(textarea, {toolbar: 'sometimes'});").length).toBeGreaterThan(0);
   });
 
-  it('mentionne chaque option et chaque export public', async () => {
+  it('mentions every option and every public export', async () => {
     const api = await import('../src/index.js');
 
     for (const name of Object.keys(api).filter((key) => key !== 'default')) {
-      expect(README, `${name} absent du README`).toMatch(new RegExp(`\\b${name}\\b`));
+      expect(README, `${name} missing from the README`).toMatch(new RegExp(`\\b${name}\\b`));
     }
 
     for (const option of ['selector', 'exclude', 'toolbar', 'footer', 'minHeight', 'maxHeight', 'emoji', 'mention', 'locale', 'styles', 'onChange']) {
-      expect(README, `option ${option} absente du README`).toContain(`\`${option}\``);
+      expect(README, `option ${option} missing from the README`).toContain(`\`${option}\``);
     }
   });
 });

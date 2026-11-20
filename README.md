@@ -186,7 +186,7 @@ Editor.mount(textarea, {locale: 'fr'});
 setEditorLocale('fr');
 
 // Override individual texts (escaped by the editor, never inserted as HTML).
-setEditorMessages({bold: 'Gras (Ctrl+B)', placeholder: 'Écrivez votre message…'});
+setEditorMessages({bold: 'Bold (Ctrl+B)', placeholder: 'Write your message…'});
 
 // Same thing, through the integrations argument.
 Editor.mount(textarea, {}, {messages: {close: 'Fermer'}});

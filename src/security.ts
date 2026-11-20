@@ -1,6 +1,6 @@
 /**
- * Fonctions de sécurité de l'éditeur : échappement HTML, adresses acceptées et nettoyage du HTML
- * chargé dans la zone de saisie. Internes au paquet (non exportées par `index.ts`).
+ * Security helpers of the editor: HTML escaping, accepted URLs and sanitizing of the HTML
+ * loaded into the writing area. Internal to the package (not exported by `index.ts`).
  */
 
 const HTML_ESCAPES: Record<string, string> = {
@@ -11,7 +11,7 @@ const HTML_ESCAPES: Record<string, string> = {
   "'": '&#39;'
 };
 
-/** Échappe un texte brut pour l'insérer dans du HTML, y compris dans un attribut entre guillemets. */
+/** Escapes plain text so it can be inserted into HTML, including inside a quoted attribute. */
 export function escapeHtml (value: unknown): string {
   return String(value ?? '').replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
 }
@@ -26,7 +26,7 @@ function resolveUrl (value: unknown): URL | null {
   }
 }
 
-/** Adresse `http(s)` (absolue ou relative, résolue sur la page) ; null sinon (`javascript:`, `data:`…). */
+/** `http(s)` URL (absolute, or relative resolved against the page); null otherwise (`javascript:`, `data:`…). */
 export function safeHttpUrl (value: unknown): string | null {
   const url = resolveUrl(value);
 
@@ -34,9 +34,9 @@ export function safeHttpUrl (value: unknown): string | null {
 }
 
 /**
- * Chemin d'un profil sur le site (sans domaine, requête ni ancre), ou null si l'adresse est
- * inexploitable. Les barres obliques de tête sont réduites à une : `//autre-site.test` serait
- * sinon un lien vers un autre domaine.
+ * Path of a profile on the site (no domain, query or anchor), or null if the URL is
+ * unusable. Leading slashes are collapsed to one: `//other-site.test` would otherwise
+ * be a link to another domain.
  */
 export function safeSitePath (value: unknown): string | null {
   const url = resolveUrl(value);
@@ -46,16 +46,16 @@ export function safeSitePath (value: unknown): string | null {
 }
 
 /* ─────────────────────────────────────────
-   Nettoyage du HTML chargé dans l'éditeur
+   Sanitizing the HTML loaded into the editor
 ───────────────────────────────────────── */
 
-/** Balises conservées : celles que produit la barre d'outils, plus les liens et les mentions. */
+/** Kept tags: those the toolbar produces, plus links and mentions. */
 const ALLOWED_TAGS = new Set([
   'a', 'b', 'blockquote', 'br', 'code', 'div', 'em', 'h2', 'h3', 'i', 'li', 'ol', 'p', 'pre',
   's', 'span', 'strike', 'strong', 'u', 'ul'
 ]);
 
-/** Balises supprimées avec leur contenu (les autres balises inconnues sont retirées, texte gardé). */
+/** Tags removed along with their content (other unknown tags are stripped, text kept). */
 const DROPPED_WITH_CONTENT = new Set([
   'script', 'style', 'iframe', 'frame', 'frameset', 'object', 'embed', 'noscript', 'template',
   'svg', 'math', 'textarea', 'select', 'option', 'title', 'head'
@@ -65,7 +65,7 @@ const TEXT_ALIGN = /^\s*text-align\s*:\s*(left|right|center|justify)\s*;?\s*$/i;
 
 function isAllowedLink (value: string): boolean {
   const href = value.trim();
-  // Chemin relatif au site (« / » seul, jamais « // »), ancre ou schéma explicitement permis.
+  // Site-relative path (a single "/", never "//"), anchor or explicitly allowed scheme.
   if (/^\/(?!\/)/.test(href) || href.startsWith('#')) return true;
 
   return /^(https?:|mailto:|tel:)/i.test(href);
@@ -126,9 +126,9 @@ function cleanNode (parent: Node): void {
 }
 
 /**
- * Nettoie du HTML avant de le charger dans la zone de saisie : liste blanche de balises et
- * d'attributs, ni script ni gestionnaire d'événement ni adresse `javascript:`. Le HTML est
- * analysé dans un document inerte (`DOMParser`) : rien ne s'exécute pendant le nettoyage.
+ * Sanitizes HTML before loading it into the writing area: allow-list of tags and
+ * attributes, no script, no event handler, no `javascript:` URL. The HTML is
+ * parsed in an inert document (`DOMParser`): nothing runs during sanitizing.
  */
 export function sanitizeHtml (html: string): string {
   const document = new DOMParser().parseFromString(html, 'text/html');

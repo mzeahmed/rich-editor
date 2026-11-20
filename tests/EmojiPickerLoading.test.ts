@@ -4,7 +4,7 @@ import EmojiPicker from '../src/EmojiPicker.js';
 const panel = (): HTMLElement => document.querySelector<HTMLElement>('.mzre-emoji-picker__panel')!;
 const tabs = (): HTMLButtonElement[] => Array.from(document.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
 
-describe('EmojiPicker : chargement à la demande des emojis', () => {
+describe('EmojiPicker: emojis are loaded on demand', () => {
   beforeEach(() => {
     EmojiPicker.destroy();
     document.body.innerHTML = '';
@@ -18,7 +18,7 @@ describe('EmojiPicker : chargement à la demande des emojis', () => {
     vi.resetModules();
   });
 
-  it('affiche la fenêtre aussitôt avec un état de chargement, puis les emojis', async () => {
+  it('shows the window at once with a loading state, then the emojis', async () => {
     const ready = EmojiPicker.open({onSelect: vi.fn()});
 
     expect(document.querySelector<HTMLElement>('.mzre-emoji-picker')?.hidden).toBe(false);
@@ -34,7 +34,7 @@ describe('EmojiPicker : chargement à la demande des emojis', () => {
     expect(document.activeElement).toBe(tabs()[0]);
   });
 
-  it('ne crée pas les onglets en double quand on rouvre pendant le chargement', async () => {
+  it('does not create duplicate tabs when reopened during loading', async () => {
     await Promise.all([EmojiPicker.open({onSelect: vi.fn()}), EmojiPicker.open({onSelect: vi.fn()})]);
     const count = tabs().length;
 
@@ -45,7 +45,7 @@ describe('EmojiPicker : chargement à la demande des emojis', () => {
     expect(tabs()).toHaveLength(count);
   });
 
-  it('remet le focus sur l’onglet actif quand on rouvre une fois les données chargées', async () => {
+  it('puts focus back on the active tab when reopened once the data is loaded', async () => {
     await EmojiPicker.open({onSelect: vi.fn()});
     tabs()[2].click();
     EmojiPicker.close();
@@ -55,7 +55,7 @@ describe('EmojiPicker : chargement à la demande des emojis', () => {
     expect(document.activeElement).toBe(tabs()[2]);
   });
 
-  it('affiche une erreur sans rejeter la promesse quand le chargement échoue, puis réessaie', async () => {
+  it('shows an error without rejecting the promise when loading fails, then retries', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     let attempts = 0;
     vi.resetModules();

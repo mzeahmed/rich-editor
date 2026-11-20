@@ -5,14 +5,14 @@ import {mountEditor, openMentionBubble, USERS} from './support.js';
 const user = (overrides: Partial<EditorUser>): EditorUser => ({...USERS[0], ...overrides});
 const items = (): HTMLElement[] => Array.from(document.querySelectorAll<HTMLElement>('.mzre-mention-item'));
 
-describe('bulle des mentions : données de l’application hôte', () => {
+describe('mention bubble: data from the host application', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     vi.restoreAllMocks();
     delete (window as unknown as {__xss?: number}).__xss;
   });
 
-  it('affiche un nom contenant du HTML comme du texte, sans créer d’élément', async () => {
+  it('displays a name containing HTML as text, without creating an element', async () => {
     const hostile = '<img src=x onerror="window.__xss=1">';
     const content = mountEditor([user({firstName: hostile, lastName: '<b>Martin</b>'})]);
     await openMentionBubble(content);
@@ -23,7 +23,7 @@ describe('bulle des mentions : données de l’application hôte', () => {
     expect((window as unknown as {__xss?: number}).__xss).toBeUndefined();
   });
 
-  it('garde un identifiant hostile dans son attribut, sans en injecter d’autres', async () => {
+  it('keeps a hostile id inside its attribute, without injecting others', async () => {
     const content = mountEditor([user({ID: '7" onmouseover="window.__xss=1" x="'})]);
     await openMentionBubble(content);
 
@@ -32,7 +32,7 @@ describe('bulle des mentions : données de l’application hôte', () => {
     expect(item.getAttributeNames().sort()).toEqual(['aria-selected', 'class', 'data-profile-url', 'data-user-id', 'id', 'role']);
   });
 
-  it('remplace par les initiales un avatar qui n’est pas en http(s)', async () => {
+  it('replaces an avatar that is not http(s) with the initials', async () => {
     const content = mountEditor([user({avatarUrl: 'javascript:alert(1)'})]);
     await openMentionBubble(content);
 
@@ -40,14 +40,14 @@ describe('bulle des mentions : données de l’application hôte', () => {
     expect(document.querySelector('.mzre-mention-avatar-fallback')!.textContent).toBe('LM');
   });
 
-  it('affiche l’avatar quand l’adresse est en http(s)', async () => {
+  it('displays the avatar when the URL is http(s)', async () => {
     const content = mountEditor([user({avatarUrl: 'https://exemple.test/lea.png'})]);
     await openMentionBubble(content);
 
     expect(document.querySelector<HTMLImageElement>('.mzre-mention-avatar img')!.src).toBe('https://exemple.test/lea.png');
   });
 
-  it('ne propose jamais un chemin de profil qui désigne un autre domaine', async () => {
+  it('never offers a profile path that points to another domain', async () => {
     const content = mountEditor([user({profileUrl: 'https://exemple.test//autre-site.test/p'})]);
     await openMentionBubble(content);
 
@@ -56,7 +56,7 @@ describe('bulle des mentions : données de l’application hôte', () => {
     expect(profileUrl.startsWith('//')).toBe(false);
   });
 
-  it('ignore un membre sans adresse de profil exploitable, sans erreur', async () => {
+  it('ignores a member without a usable profile URL, without error', async () => {
     const content = mountEditor([
       user({ID: '1', profileUrl: 'javascript:alert(1)'}),
       user({ID: '2', profileUrl: 'https://exemple.test/membres/leo/'})
@@ -66,7 +66,7 @@ describe('bulle des mentions : données de l’application hôte', () => {
     expect(items().map((item) => item.dataset.userId)).toEqual(['2']);
   });
 
-  it('affiche « aucun utilisateur » quand aucun membre n’est exploitable', async () => {
+  it('displays "no user" when no member is usable', async () => {
     const content = mountEditor([user({profileUrl: 'http://'})]);
     await openMentionBubble(content);
 
@@ -75,22 +75,22 @@ describe('bulle des mentions : données de l’application hôte', () => {
   });
 });
 
-describe('contenu initial de l’éditeur', () => {
+describe('initial content of the editor', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     delete (window as unknown as {__xss?: number}).__xss;
   });
 
-  it('est nettoyé : aucun script, aucun gestionnaire d’événement, mentions conservées', () => {
+  it('is sanitized: no script, no event handler, mentions kept', () => {
     const content = mountEditor(
       USERS,
-      '<p>Salut <a class="mention" data-user-id="7" href="/profil/lea">Léa</a>' +
+      '<p>Hi <a class="mention" data-user-id="7" href="/profile/lea">Léa</a>' +
         '<img src=x onerror="window.__xss=1"><script>window.__xss=2</script></p>'
     );
 
     expect(content.querySelector('script, img')).toBeNull();
     expect(content.innerHTML).not.toMatch(/onerror/i);
-    expect(content.textContent).toContain('Salut');
+    expect(content.textContent).toContain('Hi');
     expect(content.querySelector('a.mention')?.getAttribute('data-user-id')).toBe('7');
     expect((window as unknown as {__xss?: number}).__xss).toBeUndefined();
   });

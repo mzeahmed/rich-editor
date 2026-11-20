@@ -28,7 +28,7 @@ describe('langue et textes de l’interface', () => {
     document.body.innerHTML = '';
   });
 
-  it('est en anglais par défaut', () => {
+  it('is in English by default', () => {
     Editor.mount(textarea(), {});
 
     expect(title('bold')).toBe('Bold');
@@ -36,20 +36,20 @@ describe('langue et textes de l’interface', () => {
     expect(document.querySelector('.mzre-content')?.getAttribute('data-placeholder')).toBe('Write here…');
   });
 
-  it('passe en français avec l’option locale', () => {
+  it('switches to French with the locale option', () => {
     Editor.mount(textarea(), {locale: 'fr'});
 
     expect(title('bold')).toBe('Gras');
     expect(document.querySelector('.mzre-content')?.getAttribute('data-placeholder')).toBe('Écrivez ici…');
   });
 
-  it('ignore une langue inconnue', () => {
+  it('ignores an unknown language', () => {
     Editor.mount(textarea(), {locale: 'xx' as never});
 
     expect(title('bold')).toBe('Bold');
   });
 
-  it('remplace un texte, échappé : jamais de HTML venu de l’application hôte', () => {
+  it('overrides a text, escaped: never HTML coming from the host application', () => {
     Editor.mount(textarea(), {}, {messages: {bold: '"><img src=x onerror="window.__xss=1"> Gras'}});
 
     expect(title('bold')).toBe('"><img src=x onerror="window.__xss=1"> Gras');
@@ -57,14 +57,14 @@ describe('langue et textes de l’interface', () => {
     expect((window as unknown as {__xss?: number}).__xss).toBeUndefined();
   });
 
-  it('échappe aussi le placeholder du textarea', () => {
+  it('also escapes the textarea placeholder', () => {
     Editor.mount(textarea('"><img src=x onerror="window.__xss=2">'), {});
 
     expect(document.querySelector('.mzre-content')?.getAttribute('data-placeholder')).toBe('"><img src=x onerror="window.__xss=2">');
     expect(document.querySelector('.mzre-editor-wrap img')).toBeNull();
   });
 
-  it('fournit les emojis et les textes du sélecteur dans la langue courante, et suit un changement', async () => {
+  it('provides the emojis and the picker texts in the current language, and follows a change', async () => {
     await EmojiPicker.open({onSelect: vi.fn()});
     const english = tabLabels();
     expect(document.querySelector('.mzre-emoji-picker__title')?.textContent).toBe('Choose an emoji');
@@ -80,7 +80,7 @@ describe('langue et textes de l’interface', () => {
     expect(document.querySelectorAll('[role="tab"]')).toHaveLength(english.length);
   });
 
-  it('exporte les réglages de langue', () => {
+  it('exports the language settings', () => {
     expect(Object.keys(api)).toEqual(
       expect.arrayContaining(['Editor', 'EmojiPicker', 'messagesEn', 'messagesFr', 'setEditorLocale', 'setEditorMessages'])
     );
@@ -88,12 +88,12 @@ describe('langue et textes de l’interface', () => {
   });
 });
 
-describe('option onChange (remplace le sélecteur .ys-create-post-btn)', () => {
+describe('onChange option', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
 
-  it('est appelée au montage puis à chaque modification, avec l’état du contenu', () => {
+  it('is called at mount then on every change, with the content state', () => {
     const onChange = vi.fn();
     Editor.mount(textarea(), {onChange});
     const content = document.querySelector<HTMLElement>('.mzre-content')!;
@@ -101,10 +101,10 @@ describe('option onChange (remplace le sélecteur .ys-create-post-btn)', () => {
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenLastCalledWith({html: '', text: '', isEmpty: true});
 
-    content.textContent = 'Bonjour';
+    content.textContent = 'Hello';
     content.dispatchEvent(new Event('input'));
 
-    expect(onChange).toHaveBeenLastCalledWith({html: 'Bonjour', text: 'Bonjour', isEmpty: false});
+    expect(onChange).toHaveBeenLastCalledWith({html: 'Hello', text: 'Hello', isEmpty: false});
 
     content.textContent = '   ';
     content.dispatchEvent(new Event('input'));
@@ -112,7 +112,7 @@ describe('option onChange (remplace le sélecteur .ys-create-post-btn)', () => {
     expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({isEmpty: true}));
   });
 
-  it('ne touche plus à aucun bouton de la page', async () => {
+  it('does not touch any button of the page', async () => {
     const content = mountEditor();
     const button = document.body.appendChild(document.createElement('button'));
     button.className = 'ys-create-post-btn';
