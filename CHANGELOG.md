@@ -11,6 +11,8 @@ Before a release, the pending entries below `[Unreleased]` are moved under a hea
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-20
+
 ### Fixed
 
 - The mention bubble now follows the writing area when the page (or a scrolling container such as a
