@@ -1,0 +1,125 @@
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import Editor from '../src/Editor.js';
+import EmojiPicker from '../src/EmojiPicker.js';
+import * as api from '../src/index.js';
+import {setEditorLocale, setEditorMessages} from '../src/messages.js';
+import {mountEditor} from './support.js';
+
+const textarea = (placeholder = ''): HTMLTextAreaElement => {
+  document.body.innerHTML = `<textarea id="note"></textarea>`;
+  const field = document.querySelector<HTMLTextAreaElement>('#note')!;
+  if (placeholder) field.setAttribute('placeholder', placeholder);
+
+  return field;
+};
+const title = (command: string): string | null =>
+  document.querySelector(`[data-cmd="${command}"]`)?.getAttribute('title') ?? null;
+const tabLabels = (): string[] => Array.from(document.querySelectorAll('[role="tab"]')).map((tab) => tab.textContent ?? '');
+
+describe('langue et textes de l’interface', () => {
+  beforeEach(() => {
+    setEditorLocale('en');
+    setEditorMessages(undefined);
+    EmojiPicker.destroy();
+  });
+
+  afterEach(() => {
+    EmojiPicker.destroy();
+    document.body.innerHTML = '';
+  });
+
+  it('est en anglais par défaut', () => {
+    Editor.mount(textarea(), {});
+
+    expect(title('bold')).toBe('Bold');
+    expect(document.querySelector('.yoo-charcount')?.textContent).toContain('character');
+    expect(document.querySelector('.yoo-content')?.getAttribute('data-placeholder')).toBe('Write here…');
+  });
+
+  it('passe en français avec l’option locale', () => {
+    Editor.mount(textarea(), {locale: 'fr'});
+
+    expect(title('bold')).toBe('Gras');
+    expect(document.querySelector('.yoo-content')?.getAttribute('data-placeholder')).toBe('Écrivez ici…');
+  });
+
+  it('ignore une langue inconnue', () => {
+    Editor.mount(textarea(), {locale: 'xx' as never});
+
+    expect(title('bold')).toBe('Bold');
+  });
+
+  it('remplace un texte, échappé : jamais de HTML venu de l’application hôte', () => {
+    Editor.mount(textarea(), {}, {messages: {bold: '"><img src=x onerror="window.__xss=1"> Gras'}});
+
+    expect(title('bold')).toBe('"><img src=x onerror="window.__xss=1"> Gras');
+    expect(document.querySelector('.yoo-toolbar img')).toBeNull();
+    expect((window as unknown as {__xss?: number}).__xss).toBeUndefined();
+  });
+
+  it('échappe aussi le placeholder du textarea', () => {
+    Editor.mount(textarea('"><img src=x onerror="window.__xss=2">'), {});
+
+    expect(document.querySelector('.yoo-content')?.getAttribute('data-placeholder')).toBe('"><img src=x onerror="window.__xss=2">');
+    expect(document.querySelector('.yoo-editor-wrap img')).toBeNull();
+  });
+
+  it('fournit les emojis et les textes du sélecteur dans la langue courante, et suit un changement', async () => {
+    await EmojiPicker.open({onSelect: vi.fn()});
+    const english = tabLabels();
+    expect(document.querySelector('.yoo-emoji-picker__title')?.textContent).toBe('Choose an emoji');
+    expect(document.querySelector('.yoo-emoji-picker__tabs')?.getAttribute('aria-label')).toBe('Emoji categories');
+    EmojiPicker.close();
+
+    setEditorLocale('fr');
+    await EmojiPicker.open({onSelect: vi.fn()});
+
+    expect(document.querySelector('.yoo-emoji-picker__title')?.textContent).toBe('Choisir un emoji');
+    expect(tabLabels()).not.toEqual(english);
+    expect(tabLabels()).toHaveLength(english.length);
+    expect(document.querySelectorAll('[role="tab"]')).toHaveLength(english.length);
+  });
+
+  it('exporte les réglages de langue', () => {
+    expect(Object.keys(api)).toEqual(
+      expect.arrayContaining(['Editor', 'EmojiPicker', 'messagesEn', 'messagesFr', 'setEditorLocale', 'setEditorMessages'])
+    );
+    expect(Object.keys(api.messagesEn).sort()).toEqual(Object.keys(api.messagesFr).sort());
+  });
+});
+
+describe('option onChange (remplace le sélecteur .ys-create-post-btn)', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('est appelée au montage puis à chaque modification, avec l’état du contenu', () => {
+    const onChange = vi.fn();
+    Editor.mount(textarea(), {onChange});
+    const content = document.querySelector<HTMLElement>('.yoo-content')!;
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith({html: '', text: '', isEmpty: true});
+
+    content.textContent = 'Bonjour';
+    content.dispatchEvent(new Event('input'));
+
+    expect(onChange).toHaveBeenLastCalledWith({html: 'Bonjour', text: 'Bonjour', isEmpty: false});
+
+    content.textContent = '   ';
+    content.dispatchEvent(new Event('input'));
+
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({isEmpty: true}));
+  });
+
+  it('ne touche plus à aucun bouton de la page', async () => {
+    const content = mountEditor();
+    const button = document.body.appendChild(document.createElement('button'));
+    button.className = 'ys-create-post-btn';
+
+    content.dispatchEvent(new KeyboardEvent('keyup', {code: 'KeyA'}));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(button.className).toBe('ys-create-post-btn');
+  });
+});

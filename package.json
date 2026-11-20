@@ -1,0 +1,62 @@
+{
+  "name": "@mzeahmed/rich-editor",
+  "version": "0.1.0",
+  "private": false,
+  "license": "MIT",
+  "author": "mzeahmed",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mzeahmed/rich-editor.git"
+  },
+  "homepage": "https://github.com/mzeahmed/rich-editor#readme",
+  "bugs": {
+    "url": "https://github.com/mzeahmed/rich-editor/issues"
+  },
+  "keywords": [
+    "editor",
+    "rich-text",
+    "wysiwyg",
+    "contenteditable",
+    "mentions",
+    "emoji"
+  ],
+  "description": "Framework-agnostic rich text editor (contenteditable) with @mentions and a built-in emoji picker.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/build-css.mjs",
+    "test": "vitest run --environment jsdom",
+    "check:package": "node scripts/check-package.mjs",
+    "prepack": "npm run build && npm run check:package"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "emojibase-data": "^15.3.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
