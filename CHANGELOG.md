@@ -11,6 +11,8 @@ Before a release, the pending entries below `[Unreleased]` are moved under a hea
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-20
+
 ### Added
 
 - The colors of the mention bubble and of the mention link are customizable, per editor, with the new
