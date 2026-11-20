@@ -28,7 +28,7 @@ check: build ## Build, then check the built package (Node import, style.css, exp
 pack: ## List the contents of the published archive, without publishing
 	npm pack --dry-run
 
-ci: install test check pack ## Reproduce the continuous integration locally
+ci: install test check pack audit ## Reproduce the continuous integration locally
 
 audit: ## Audit the production dependencies
 	npm audit --omit=dev --audit-level=high

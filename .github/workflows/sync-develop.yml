@@ -1,0 +1,46 @@
+# =============================================================================
+# rich-editor — keep develop in sync with main
+# =============================================================================
+# Same job as `sync:main-to-develop` in the Yoostart API and front pipelines:
+# `develop` always contains what was really merged into `main`. A conflict is
+# left visible in the job (it fails): no history is overwritten and no force
+# push is used.
+#
+# If `develop` is protected, allow GitHub Actions to push to it (bypass list).
+# =============================================================================
+name: Sync develop
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+# Never two merges at once.
+concurrency:
+  group: sync-develop
+  cancel-in-progress: false
+
+jobs:
+  main-to-develop:
+    name: Merge main into develop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Merge main into develop
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+
+          if git show-ref --quiet refs/remotes/origin/develop; then
+            git checkout develop
+            git merge origin/main --no-edit
+            git push origin develop
+          else
+            echo "develop does not exist: sync skipped"
+          fi

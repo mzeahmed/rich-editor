@@ -1,10 +1,16 @@
 # Releasing
 
-Publishing is driven by a **version tag**. Pushing `vX.Y.Z` runs
-[`.github/workflows/release.yml`](./.github/workflows/release.yml), which checks the release, runs the
-tests, publishes to npm with provenance and creates the GitHub release. Pull requests and `main` run
-[`ci.yml`](./.github/workflows/ci.yml) (tests on Node 20 and 22, build, package check, dependency
-audit).
+Nothing is pushed to `main` directly: every change, a release included, goes through a pull request.
+The model is the one of the Yoostart API and front repositories.
+
+| Step | Workflow | What it does |
+| --- | --- | --- |
+| Pull request into `main` | [`ci.yml`](./.github/workflows/ci.yml) | Quality only: tests on Node 20 and 22, build, package check, dependency audit. The `Quality` check must pass to merge. |
+| Merge into `main` | [`sync-develop.yml`](./.github/workflows/sync-develop.yml) | Merges `main` into `develop` (no force push; a conflict fails the job and is left to fix by hand). |
+| Tag `vX.Y.Z` on `main` | [`release.yml`](./.github/workflows/release.yml) | Checks the release, runs the tests, publishes to npm with provenance and creates the GitHub release. |
+
+Every new branch is created from `develop` (up to date with `origin/develop`), never from `main`,
+and its name has no `/`: use hyphens (`mention-trigger-fix`).
 
 Versions follow [Semantic Versioning](https://semver.org/). While the version is `0.x`, a minor
 version may contain breaking changes (always listed in [CHANGELOG.md](./CHANGELOG.md)).
@@ -32,11 +38,19 @@ version may contain breaking changes (always listed in [CHANGELOG.md](./CHANGELO
    workflow (check the current npm documentation for the required npm version).
 4. **Approval step (recommended).** Create an **`npm`** environment (Settings → Environments) and add
    yourself as a required reviewer: each publication then waits for a click.
-5. **Protect `main`.** Require the CI checks to pass before merging.
+5. **Protect `main`.** Settings → Rules → Rulesets (or Branches → Branch protection rules), target
+   `main`:
+   - require a pull request before merging;
+   - require the status check **`Quality`** (the job of `ci.yml`) and require branches to be up to date;
+   - block force pushes and deletion;
+   - no bypass, except if you need it for yourself.
+
+   The check only appears in the list after `ci.yml` has run once on a pull request. If `develop`
+   is protected too, let GitHub Actions bypass it, otherwise `sync-develop.yml` cannot push.
 
 ## Making a release
 
-1. Make sure `main` is green.
+1. Create a branch from `develop`, with no `/` in its name (for example `release-X.Y.Z`).
 2. In [CHANGELOG.md](./CHANGELOG.md), move the entries from `## [Unreleased]` to a new section
    `## [X.Y.Z] - YYYY-MM-DD` and leave `[Unreleased]` empty.
 3. Set the version, without tagging yet, and commit:
@@ -49,24 +63,29 @@ version may contain breaking changes (always listed in [CHANGELOG.md](./CHANGELO
 4. Check locally what the pipeline will check:
 
    ```bash
-   node scripts/release.mjs check vX.Y.Z
-   npm test && npm pack --dry-run
+   make release-check
+   make ci
    ```
 
-5. Tag and push:
+5. Open a pull request into `main`. When `Quality` is green, merge it. `sync-develop.yml` then merges
+   `main` into `develop` on its own.
+6. Tag the merged commit **on `main`** and push the tag only:
 
    ```bash
-   git tag vX.Y.Z
-   git push origin main vX.Y.Z
+   git switch main && git pull
+   make release   # checks, tests, creates the local tag vX.Y.Z
+   git push origin vX.Y.Z
    ```
 
-6. Approve the run if you configured the `npm` environment, then verify on npm: the new version, the
+   `release.yml` refuses a tag that is not on `main`.
+7. Approve the run if you configured the `npm` environment, then verify on npm: the new version, the
    *Provenance* badge, and `npm view @mzeahmed/rich-editor`.
 
 ### What the pipeline refuses
 
 `node scripts/release.mjs check` stops the release (before anything is published) when:
 
+- the tagged commit is not on `main`;
 - the tag is not `vX.Y.Z` or `vX.Y.Z-beta.1`, or differs from the `package.json` version;
 - `CHANGELOG.md` has no `## [X.Y.Z] - YYYY-MM-DD` section, its date is missing or invalid, or it
   describes no change;
