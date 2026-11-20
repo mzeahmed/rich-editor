@@ -26,6 +26,18 @@ jobs:
       TAG: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      # Everything reaches `main` through a pull request whose CI passed: a tag on any other commit
+      # (a branch, a draft) must never be published.
+      - name: Check the tag is on main
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
+            echo "Tag $TAG is not on main: merge the pull request first, then tag main."
+            exit 1
+          }
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:

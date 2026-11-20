@@ -1,9 +1,20 @@
+# =============================================================================
+# rich-editor — quality pipeline
+# =============================================================================
+# Same model as the Yoostart API and front pipelines: pull requests run the
+# quality checks only. Merging into `main` then triggers the follow-up
+# workflows (sync-develop.yml); a release is a version tag, handled by
+# release.yml.
+#
+# Nothing runs on a push to `main` here: the code was already checked in the
+# pull request. The `Quality` job below is the single check to require in the
+# branch protection of `main`; a failing job blocks the merge.
+# =============================================================================
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -59,3 +70,19 @@ jobs:
 
       # Only what ships to users (production dependencies).
       - run: npm audit --omit=dev --audit-level=high
+
+  # The one check to require on `main`. Matrix job names change with the matrix, this one does not.
+  # `always()` makes it run (and fail) when a job above failed or was cancelled, instead of being
+  # skipped, which the protection would treat as passed.
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    needs: [test, audit]
+    if: always()
+    steps:
+      - name: All checks passed
+        run: |
+          [ "${{ needs.test.result }}" = "success" ] && [ "${{ needs.audit.result }}" = "success" ] || {
+            echo "Quality failed: tests=${{ needs.test.result }}, audit=${{ needs.audit.result }}"
+            exit 1
+          }
