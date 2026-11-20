@@ -11,6 +11,12 @@ Before a release, the pending entries below `[Unreleased]` are moved under a hea
 
 ## [Unreleased]
 
+### Fixed
+
+- The mention bubble now follows the writing area when the page (or a scrolling container such as a
+  modal) scrolls or the window is resized. It used to stay where it opened. It is hidden while the
+  writing area is out of the viewport.
+
 ## [0.1.1] - 2026-11-20
 
 ### Fixed
