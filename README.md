@@ -146,6 +146,8 @@ profileUrl: string}`.
   address, does not.
 - Choosing a user inserts `<a class="mention" href="/path/of/profile" data-user-id="…"
   target="_blank">First Last</a>`. Only the **path** of `profileUrl` is kept in the link.
+- The bubble stays next to the writing area while the page or a scrolling container moves, and is
+  hidden while the writing area is out of view.
 - The bubble closes when you choose a user, press Space, Enter or Escape, click its **×** button, or
   click anywhere outside of it.
 - Users without a usable `profileUrl` (`http(s)` or relative) are not offered. An avatar that is not

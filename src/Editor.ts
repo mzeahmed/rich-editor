@@ -227,6 +227,8 @@ interface MentionState {
   stopOutsideClose: (() => void) | null;
   /** Last "@" the user dismissed (Escape, cross, click outside): it must not reopen by itself. */
   dismissed: {node: Text; offset: number} | null;
+  /** Removes the scroll / resize listeners that keep the bubble next to the writing area. */
+  stopFollow: (() => void) | null;
 }
 
 let mentionBubbleCount = 0;
@@ -700,6 +702,7 @@ export default class Editor {
       listId: null,
       stopOutsideClose: null,
       dismissed: null,
+      stopFollow: null,
     };
 
     // In capture phase: before the editor's handler (otherwise Tab inserts spaces).
@@ -765,6 +768,7 @@ export default class Editor {
       state.previousTerm = null;
       state.dropdown = Editor._showMentionDropdown(content, state, integration);
       Editor._closeOnOutsidePointer(state);
+      Editor._followWritingArea(state, content);
     }
 
     if (trigger.term.length >= 2 && trigger.term !== state.previousTerm) {
@@ -827,6 +831,9 @@ export default class Editor {
     dropdown.style.left = `${Math.round(rect.left)}px`;
     dropdown.style.width = `${width}px`;
 
+    // The bubble is fixed on the page: out of sight while the writing area is, instead of floating alone.
+    dropdown.style.visibility = rect.bottom > 0 && rect.top < window.innerHeight ? '' : 'hidden';
+
     const spaceBelow = window.innerHeight - rect.bottom;
     if (spaceBelow >= dropH || spaceBelow >= 150) {
       // Below the writing area
@@ -837,6 +844,34 @@ export default class Editor {
       dropdown.style.bottom = `${Math.round(window.innerHeight - rect.top + 4)}px`;
       dropdown.style.top = 'auto';
     }
+  }
+
+  /**
+   * Keeps the bubble next to the writing area while the page scrolls or the window is resized. The
+   * bubble is fixed on `document.body`, so it does not move with the page by itself. `scroll` does
+   * not bubble: listening in the capture phase of the window also catches the scroll of a container
+   * (a modal, a panel). The listeners are removed by _closeMentionDropdown().
+   */
+  private static _followWritingArea (state: MentionState, content: HTMLElement): void {
+    let frame = 0;
+
+    // At most one repositioning per frame, however many scroll events the browser sends.
+    const update = (): void => {
+      if (frame) return;
+
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        if (state.dropdown) Editor._positionDropdown(state.dropdown, content);
+      });
+    };
+
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    state.stopFollow = (): void => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
   }
 
   /**
@@ -862,6 +897,8 @@ export default class Editor {
     state.previousTerm = null;
     state.stopOutsideClose?.();
     state.stopOutsideClose = null;
+    state.stopFollow?.();
+    state.stopFollow = null;
     state.dropdown?.remove();
     state.dropdown = null;
     state.activeIndex = -1;
