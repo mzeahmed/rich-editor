@@ -11,6 +11,8 @@ Before a release, the pending entries below `[Unreleased]` are moved under a hea
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-20
+
 ### Fixed
 
 - The mention bubble now opens when the letters follow the `@` without a pause: it used to open only
