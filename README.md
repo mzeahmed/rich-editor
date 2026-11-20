@@ -1,5 +1,10 @@
 # @mzeahmed/rich-editor
 
+[![npm version](https://img.shields.io/npm/v/@mzeahmed/rich-editor)](https://www.npmjs.com/package/@mzeahmed/rich-editor)
+[![license](https://img.shields.io/npm/l/@mzeahmed/rich-editor)](https://github.com/mzeahmed/rich-editor/blob/main/LICENSE)
+[![TypeScript types](https://img.shields.io/npm/types/@mzeahmed/rich-editor)](https://www.npmjs.com/package/@mzeahmed/rich-editor)
+[![node](https://img.shields.io/node/v/@mzeahmed/rich-editor)](https://nodejs.org/)
+
 A small, framework-agnostic rich text editor built on `contenteditable`, with **@mentions**, a
 built-in **emoji picker**, strict-CSP support and keyboard accessibility.
 
