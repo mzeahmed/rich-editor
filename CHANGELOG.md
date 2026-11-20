@@ -11,6 +11,8 @@ Before a release, the pending entries below `[Unreleased]` are moved under a hea
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-20
+
 First public release.
 
 ### Added
