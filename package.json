@@ -54,7 +54,7 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
-    "emojibase-data": "^15.3.2"
+    "emojibase-data": "^18.0.0"
   },
   "publishConfig": {
     "access": "public"
