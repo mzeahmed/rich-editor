@@ -141,7 +141,9 @@ profileUrl: string}`.
 
 **How it behaves**
 
-- Typing `@`, then at least two letters opens a bubble with the matching users.
+- Typing `@` at the start of a word, then at least two letters, opens a bubble with the matching users.
+  Typing fast works (`@le` typed at once opens it); an `@` inside a word, such as in an e-mail
+  address, does not.
 - Choosing a user inserts `<a class="mention" href="/path/of/profile" data-user-id="…"
   target="_blank">First Last</a>`. Only the **path** of `profileUrl` is kept in the link.
 - The bubble closes when you choose a user, press Space, Enter or Escape, click its **×** button, or

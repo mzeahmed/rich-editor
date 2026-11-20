@@ -11,6 +11,16 @@ Before a release, the pending entries below `[Unreleased]` are moved under a hea
 
 ## [Unreleased]
 
+### Fixed
+
+- The mention bubble now opens when the letters follow the `@` without a pause: it used to open only
+  if the `@` was seen alone by the debounced key handler, so typing `@le` quickly opened nothing.
+- An `@` inside a word (such as `jean@…` in an e-mail address) no longer opens the bubble.
+- The bubble now closes when the text after the `@` contains a space, even if no Space key release
+  was seen (paste, fast typing).
+- A bubble dismissed with Escape, the cross or a click outside no longer reopens by itself while
+  the same `@term` is still being typed; typing a new `@` opens it again.
+
 ## [0.1.0] - 2026-11-20
 
 First public release.

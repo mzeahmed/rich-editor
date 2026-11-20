@@ -1,6 +1,6 @@
 import {expect, vi} from 'vitest';
 import Editor from '../src/Editor.js';
-import type {EditorUser} from '../src/types.js';
+import type {EditorMentionIntegration, EditorUser} from '../src/types.js';
 
 // jsdom does not implement innerText, which the editor reads: plain-text equivalent for the tests.
 Object.defineProperty(HTMLElement.prototype, 'innerText', {
@@ -27,7 +27,11 @@ export const USERS: EditorUser[] = [
 ];
 
 /** Mounts the editor with mentions; the search returns `users` without waiting. */
-export function mountEditor(users: EditorUser[] = USERS, initialValue = ''): HTMLElement {
+export function mountEditor(
+  users: EditorUser[] = USERS,
+  initialValue = '',
+  debounce: EditorMentionIntegration['debounce'] = (callback) => callback
+): HTMLElement {
   document.body.innerHTML = '<textarea id="post"></textarea>';
   document.querySelector<HTMLTextAreaElement>('#post')!.value = initialValue;
 
@@ -36,7 +40,7 @@ export function mountEditor(users: EditorUser[] = USERS, initialValue = ''): HTM
       loader: {freezeElement() {}, unfreezeElement() {}},
       searchUsers: vi.fn().mockResolvedValue(users),
       encodeUserId: (id) => id,
-      debounce: (callback) => callback
+      debounce
     }
   });
 

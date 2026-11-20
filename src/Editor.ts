@@ -225,6 +225,8 @@ interface MentionState {
   listId: string | null;
   /** Removes the "click outside" listener set when the bubble opened. */
   stopOutsideClose: (() => void) | null;
+  /** Last "@" the user dismissed (Escape, cross, click outside): it must not reopen by itself. */
+  dismissed: {node: Text; offset: number} | null;
 }
 
 let mentionBubbleCount = 0;
@@ -697,6 +699,7 @@ export default class Editor {
       activeIndex: -1,
       listId: null,
       stopOutsideClose: null,
+      dismissed: null,
     };
 
     // In capture phase: before the editor's handler (otherwise Tab inserts spaces).
@@ -704,13 +707,24 @@ export default class Editor {
       Editor._handleMentionKeydown(e, content, state, integration);
     }, true);
 
-    content.addEventListener('keyup', integration.debounce((e: KeyboardEvent) => {
-      Editor._handleMentionSearch(e, content, state, integration);
+    // Debounced: a burst of key releases ("@le" typed quickly) reaches the handler only once, with
+    // the last one. It therefore looks at the text before the caret, not at the key that was pressed.
+    content.addEventListener('keyup', integration.debounce(() => {
+      Editor._handleMentionSearch(content, state, integration);
     }, 300));
   }
 
+  /**
+   * The "@term" that ends at the caret: an "@" at the start of a word (not inside an e-mail
+   * address) followed by characters with no space. `index` is the position of the "@".
+   */
+  private static _findMentionTrigger (textBeforeCursor: string): {index: number; term: string} | null {
+    const match = /(^|\s)@([^\s@]*)$/.exec(textBeforeCursor);
+
+    return match ? {index: match.index + match[1].length, term: match[2]} : null;
+  }
+
   private static _handleMentionSearch (
-    e: KeyboardEvent,
     content: HTMLElement,
     state: MentionState,
     integration: EditorMentionIntegration
@@ -721,45 +735,41 @@ export default class Editor {
     const range = sel.getRangeAt(0);
     const node = range.endContainer;
 
-    if (node.nodeType !== Node.TEXT_NODE) return;
+    if (node.nodeType !== Node.TEXT_NODE) {
+      if (state.isSearch) Editor._closeMentionDropdown(state);
+      return;
+    }
 
     const textNode = node as Text;
-    const textBeforeCursor = (textNode.textContent ?? '').substring(0, range.endOffset);
-    const lastChar = textBeforeCursor[textBeforeCursor.length - 1];
+    const trigger = Editor._findMentionTrigger((textNode.textContent ?? '').substring(0, range.endOffset));
 
-    if (lastChar === '@') {
+    if (!trigger) {
+      if (state.isSearch) Editor._closeMentionDropdown(state);
+      return;
+    }
+
+    const isCurrent = state.isSearch && state.atNode === textNode && state.atOffset === trigger.index;
+
+    if (!isCurrent) {
+      // A "@" the user dismissed stays dismissed while they keep typing after it; a freshly typed
+      // "@" (nothing after it yet) always opens, even at the same position.
+      const dismissed = state.dismissed;
+      if (trigger.term !== '' && dismissed?.node === textNode && dismissed.offset === trigger.index) return;
+
       // A new "@" while a bubble is open: the old one must not stay on screen.
       Editor._closeMentionDropdown(state);
+      state.dismissed = null;
       state.isSearch = true;
       state.atNode = textNode;
-      state.atOffset = range.endOffset - 1;
+      state.atOffset = trigger.index;
       state.previousTerm = null;
       state.dropdown = Editor._showMentionDropdown(content, state, integration);
       Editor._closeOnOutsidePointer(state);
-      return;
     }
 
-    if (!state.isSearch) return;
-
-    if (
-      e.code === 'Space' || e.code === 'Escape' || e.code === 'Enter' ||
-      content.innerText.trim() === '' || state.atNode !== textNode
-    ) {
-      Editor._closeMentionDropdown(state);
-      return;
-    }
-
-    const atIndex = textBeforeCursor.lastIndexOf('@');
-    if (atIndex === -1) {
-      Editor._closeMentionDropdown(state);
-      return;
-    }
-
-    const term = textBeforeCursor.substring(atIndex + 1).trim();
-
-    if (term.length >= 2 && term !== state.previousTerm) {
-      state.previousTerm = term;
-      Editor._performMentionSearch(term, content, state, integration);
+    if (trigger.term.length >= 2 && trigger.term !== state.previousTerm) {
+      state.previousTerm = trigger.term;
+      Editor._performMentionSearch(trigger.term, content, state, integration);
     }
   }
 
@@ -846,6 +856,7 @@ export default class Editor {
   }
 
   private static _closeMentionDropdown (state: MentionState): void {
+    state.dismissed = state.atNode ? {node: state.atNode, offset: state.atOffset} : null;
     state.isSearch = false;
     state.atNode = null;
     state.previousTerm = null;
