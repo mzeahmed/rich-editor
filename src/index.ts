@@ -12,4 +12,5 @@ export type {
   EditorLoader,
   EditorMentionIntegration,
   EditorUser,
+  MentionColors,
 } from './types.js';
